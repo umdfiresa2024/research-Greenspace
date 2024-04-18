@@ -1,0 +1,20 @@
+---
+title: "Clean 911 reports data"
+format: html
+editor: visual
+---
+
+Install library
+
+```{r}
+#install.packages("tidyverse")
+library("tidyverse")
+```
+
+Read 911 file
+
+```{r}
+df<-read.csv("911_Behavioral_Health_Diversion.csv")
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
