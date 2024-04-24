@@ -2,9 +2,23 @@ library("dplyr")
 df_calls <- read.csv("911BehavioralHealthDiversion.csv")
 #Entries are identified by police district, year, and month
 #for each entry we observe call frequency, number of trees, and whether the month is peak fly activity
-df <- df_calls %>%
-	mutate(Year=as.numeric(substring(callDateTime,1,4)),
-		Month=as.numeric(substring(callDateTime,6,7))) %>%
-	group_by(policeDistrict, Year, Month) %>%
+
+#identifying variables
+pd_names <-c("Central","Eastern","Northeastern","Northern","Northwestern","Southeastern","Southern","Southwestern","Western")
+time_y <- 2021:2024
+time_m <- 1:12
+df0 <- data.frame(month=rep(time_m, times=length(pd_names)*length(time_y)),
+		    year=rep(time_y, times=length(pd_names), each=length(time_m)),
+		    policeDistrict=rep(pd_names, each=length(time_m)*length(time_y))) %>%
+	filter((year > 2021 | month >= 6) & (year < 2024 | month <= 1))
+#attatch call data
+df1 <- df_calls %>%
+	mutate(year=as.numeric(substring(callDateTime,1,4)),
+		month=as.numeric(substring(callDateTime,6,7))) %>%
+	group_by(month,year,policeDistrict) %>%
 	summarise(callFreq=n())
-write.csv(df,"callFrequency.csv")
+df2 <- merge(df0, df1, all.x=TRUE)
+df3 <- df2 %>%
+	mutate(callFreq=ifelse(is.na(callFreq),0,callFreq))
+df3
+write.csv(df3,"callFrequency.csv")
