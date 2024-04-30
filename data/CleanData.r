@@ -68,5 +68,9 @@ df_parks <-df_parks2 %>%
 	filter(policeDistrict %in% pd_names) %>%
 	rename(nParks = n)
 ## Combine columns
-df_final <- merge(df_call_freq, df_parks)
+df_call_park <- merge(df_call_freq, df_parks)
+
+## III. Add lantern fly column
+df_final <- df_call_park %>%
+	mutate(isFlySeason = (month >= 7 & month <= 9))
 write.csv(df_final, "ParkCall.csv")
