@@ -1,4 +1,4 @@
-setwd("data")
+#setwd("data")
 library("dplyr")
 
 # Entries are identified by police district, year, and month
@@ -70,7 +70,8 @@ df_parks <-df_parks2 %>%
 ## Combine columns
 df_call_park <- merge(df_call_freq, df_parks)
 
-## III. Add lantern fly column
+## III. Add Season Type
 df_final <- df_call_park %>%
-	mutate(isFlySeason = (month >= 7 & month <= 9))
+	mutate(Season= (ifelse(month >= 3 & month <= 6,"Regular",
+			       ifelse(month >=7 & month <= 11, "Lantern Fly", "Winter"))))
 write.csv(df_final, "ParkCall.csv")
