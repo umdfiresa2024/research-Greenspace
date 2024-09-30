@@ -1,0 +1,69 @@
+---
+title: "Get Average Temp"
+format: html
+editor: visual
+---
+
+Upload packages
+
+```{r}
+library("tidyverse")
+library("terra")
+```
+
+Upload police district shapefile
+
+```{r}
+shape<-vect("Police_Districts_2023/Police_Districts_2023.shp")
+
+shapedf<-as.data.frame(shape)
+
+shape_project <- terra::project(shape,"+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+
+plot(shape)
+```
+
+Find average temperature for 1 day
+
+```{r}
+i<-1
+
+path<-"G:/Shared drives/2024 FIRE-SA/DATA/TERRA/"
+
+files<-dir(path)
+
+r<-rast(paste0(path, files[i]))
+
+plot(r[[1]])
+plot(shape_project, add=TRUE)
+
+plot(shape_project)
+plot(r[[1]],add=TRUE)
+
+cntrl_df<-terra::extract(r, shape_project, fun="mean", na.rm=TRUE)
+```
+
+```{r}
+
+
+
+shape_project <- terra::project(shape,crs(r))
+
+path<-"G:/Shared drives/2024 FIRE-SA/DATA/TERRA/"
+
+files<-dir(path)
+
+output<-c()
+
+for (i in 1:length(files)) {
+  print(i)
+
+  r<-rast(paste0(path, files[i]))
+
+  cntrl_df<-terra::extract(r, shape_project, fun="mean", na.rm=TRUE)
+
+  cntrl_df$filename<-files[i]
+  
+  output<-rbind(output, cntrl_df)
+}
+```
