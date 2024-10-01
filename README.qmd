@@ -90,13 +90,13 @@ $$
 
 ## Question 8: What fixed effects can be included in the regression? What does each fixed effects control for? Please include a new equation that incorporates the fixed effects.
 
-Answer: add fix_fx for every police district
+Answer:
 
 Police district: controls for better or worse conditions in the city
 
-Daytime:
+Daytime: controls the differences that might occur based on the time of day
 
-Year:
+Year: controls any differences that might have occurred one year to another
 
 ## Question 9: What is the impact of the treatment effect once fixed effects are included?
 
@@ -106,7 +106,7 @@ Answer:
 install.packages("lfe")
 library("lfe")
 
-#model2<-lm(temp_F ~ callscount | policeDistrict + daytime + year, data=df)
+model2<-felm(temp_F ~ callscount | policeDistrict + daytime + year, data=df)
 ```
 
 # Questions for Week 5
