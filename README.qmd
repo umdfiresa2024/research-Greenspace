@@ -7,6 +7,7 @@ editor: visual
 Step 1. Install necessary packages.
 
 ```{r}
+#| eval: false
 install.packages("tidyverse")
 install.packages("kableExtra")
 ```
@@ -24,12 +25,17 @@ Step 4. Open the dataframe into the RStudio Environment.
 
 ```{r}
 df<-read.csv("panel.csv")
+df2<-df %>%
+  mutate(call_bin = ifelse(callscount>0, 1, 0)) %>%
+  mutate(date = as.Date(date)) %>%
+  mutate(month = month(date)) %>%
+  mutate(dow = weekdays(date))
 ```
 
 Step 5. Use the **head** and **kable** function showcase the first 10 rows of the dataframe to the reader.
 
 ```{r}
-kable(head(df))
+kable(head(df2))
 ```
 
 ## Question 1: What is the frequency of this data frame?
@@ -43,7 +49,7 @@ Answer: Police district
 Step 6. Use the **names** function to display all the variables (column) in the dataframe.
 
 ```{r}
-names(df)
+names(df2)
 
 ```
 
@@ -53,40 +59,37 @@ Answer: temp_F
 
 ## Question 4: Which column represents the outcome variable of interest?
 
-Answer: callscount
+Answer: call_bin
 
 Step 7: Create a boxplot to visualize the distribution of the outcome variable under treatment and no treatment.
 
 ```{r}
-#| eval: false
-ggplot(df, aes(x=nox_emit)) +
-  geom_histogram() +
-  facet_wrap(~nbp)
+ggplot(df2, aes(x=temp_F)) +
+  geom_boxplot() +
+  facet_wrap(~call_bin)
 ```
+
+![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
 
 Step 8: Fit a regression model $y=\beta_0 + \beta_1 x + \epsilon$ where $y$ is the outcome variable and $x$ is the treatment variable. Use the **summary** function to display the results.
 
 ```{r}
-model1<-lm(callscount ~ temp_F, data=df)
+model1<-lm(call_bin ~ temp_F, data=df2)
 
 summary(model1)
 ```
-
-## Question 5: What is the predicted value of the outcome variable when treatment=0?
-
-Answer: N/A
-
-## Question 6: What is predicted value of the outcome variable when treatment=1?
-
-Answer: N/A
 
 ## Question 7: What is the equation that describes the linear regression above? Please include an explanation of the variables and subscripts.
 
 Answer:
 
 $$
-callscount = \beta_0 + \beta_1 temp_F + \epsilon
+callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \epsilon_{pdt}
 $$
+
+Where $callscount$ represents the outcome variable that shows whether there a call from police district \$p\$, on day \$d\$, at time of day \$t\$.
+
+Where $temp$ determines the temperature in Fahrenheit.
 
 ## Question 8: What fixed effects can be included in the regression? What does each fixed effects control for? Please include a new equation that incorporates the fixed effects.
 
@@ -103,10 +106,13 @@ Year: controls any differences that might have occurred one year to another
 Answer:
 
 ```{r}
-install.packages("lfe")
+
+#install.packages("lfe")
 library("lfe")
 
-model2<-felm(temp_F ~ callscount | policeDistrict + daytime + year, data=df)
+model2<-felm(temp_F ~ call_bin | policeDistrict + daytime + year + month + dow, data=df2)
+
+summary(model2)
 ```
 
 # Questions for Week 5
