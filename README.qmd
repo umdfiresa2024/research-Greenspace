@@ -1,5 +1,5 @@
 ---
-title: "Research Question"
+title: "How does high tempuratures affect mental health in Baltimore City?"
 format: gfm
 editor: visual
 ---
@@ -23,7 +23,7 @@ Step 3. Upload the dataframe that you have created in Spring 2024 into the repos
 Step 4. Open the dataframe into the RStudio Environment.
 
 ```{r}
-df<-read.csv("data.csv")
+df<-read.csv("panel.csv")
 ```
 
 Step 5. Use the **head** and **kable** function showcase the first 10 rows of the dataframe to the reader.
@@ -34,11 +34,11 @@ kable(head(df))
 
 ## Question 1: What is the frequency of this data frame?
 
-Answer:
+Answer: Daily- day and night
 
 ## Question 2: What is the cross-sectional (geographical) unit of this data frame?
 
-Answer:
+Answer: Police district
 
 Step 6. Use the **names** function to display all the variables (column) in the dataframe.
 
@@ -49,15 +49,16 @@ names(df)
 
 ## Question 3: Which column represents the treatment variable of interest?
 
-Answer:
+Answer: temp_F
 
 ## Question 4: Which column represents the outcome variable of interest?
 
-Answer:
+Answer: callscount
 
 Step 7: Create a boxplot to visualize the distribution of the outcome variable under treatment and no treatment.
 
 ```{r}
+#| eval: false
 ggplot(df, aes(x=nox_emit)) +
   geom_histogram() +
   facet_wrap(~nbp)
@@ -66,30 +67,47 @@ ggplot(df, aes(x=nox_emit)) +
 Step 8: Fit a regression model $y=\beta_0 + \beta_1 x + \epsilon$ where $y$ is the outcome variable and $x$ is the treatment variable. Use the **summary** function to display the results.
 
 ```{r}
-model1<-lm(nox_emit ~ nbp, data=df)
+model1<-lm(callscount ~ temp_F, data=df)
 
 summary(model1)
 ```
 
 ## Question 5: What is the predicted value of the outcome variable when treatment=0?
 
-Answer:
+Answer: N/A
 
 ## Question 6: What is predicted value of the outcome variable when treatment=1?
 
-Answer:
+Answer: N/A
 
 ## Question 7: What is the equation that describes the linear regression above? Please include an explanation of the variables and subscripts.
 
 Answer:
 
+$$
+callscount = \beta_0 + \beta_1 temp_F + \epsilon
+$$
+
 ## Question 8: What fixed effects can be included in the regression? What does each fixed effects control for? Please include a new equation that incorporates the fixed effects.
 
-Answer:
+Answer: add fix_fx for every police district
+
+Police district: controls for better or worse conditions in the city
+
+Daytime:
+
+Year:
 
 ## Question 9: What is the impact of the treatment effect once fixed effects are included?
 
 Answer:
+
+```{r}
+install.packages("lfe")
+library("lfe")
+
+#model2<-lm(temp_F ~ callscount | policeDistrict + daytime + year, data=df)
+```
 
 # Questions for Week 5
 
