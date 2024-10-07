@@ -140,7 +140,7 @@ summary(model1)
 Answer:
 
 $$
-callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \epsilon_{pdt}
+callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \gamma_p + \eta_d + \theta_{dayofweek} + \omega_{month} + \pi_year+\epsilon_{pdt}
 $$
 
 Where $callscount$ represents the outcome variable that shows whether
@@ -180,45 +180,102 @@ library("lfe")
         expand, pack, unpack
 
 ``` r
-model2<-felm(temp_F ~ call_bin | policeDistrict + daytime + year + month + dow, data=df2)
+model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
+               policeDistrict + year + month + dow, data=df2)
 
 summary(model2)
 ```
 
 
     Call:
-       felm(formula = temp_F ~ call_bin | policeDistrict + daytime +      year + month + dow, data = df2) 
+       felm(formula = call_bin ~ temp_F + daytime + temp_F:daytime |      policeDistrict + year + month + dow, data = df2) 
 
     Residuals:
-        Min      1Q  Median      3Q     Max 
-    -44.145  -4.917   0.114   5.001  29.583 
+         Min       1Q   Median       3Q      Max 
+    -0.17312 -0.09836 -0.07288 -0.04830  0.98544 
 
     Coefficients:
-             Estimate Std. Error t value Pr(>|t|)
-    call_bin   0.1430     0.3183   0.449    0.653
+                     Estimate Std. Error t value Pr(>|t|)
+    temp_F          1.930e-04  4.406e-04   0.438    0.661
+    daytime        -2.704e-02  2.037e-02  -1.327    0.184
+    temp_F:daytime -3.456e-05  3.188e-04  -0.108    0.914
 
-    Residual standard error: 7.852 on 8422 degrees of freedom
-    Multiple R-squared(full model): 0.8746   Adjusted R-squared: 0.8741 
-    Multiple R-squared(proj model): 2.396e-05   Adjusted R-squared: -0.003419 
-    F-statistic(full model): 2025 on 29 and 8422 DF, p-value: < 2.2e-16 
-    F-statistic(proj model): 0.2018 on 1 and 8422 DF, p-value: 0.6533 
+    Residual standard error: 0.2689 on 8421 degrees of freedom
+    Multiple R-squared(full model): 0.0145   Adjusted R-squared: 0.01099 
+    Multiple R-squared(proj model): 0.002268   Adjusted R-squared: -0.001287 
+    F-statistic(full model): 4.13 on 30 and 8421 DF, p-value: 2.94e-13 
+    F-statistic(proj model):  6.38 on 3 and 8421 DF, p-value: 0.0002584 
     *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
 
-# Questions for Week 5
+``` r
+df3<-df2 %>%
+  mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
+  mutate(temp_90_100=ifelse(temp_F>90 & temp_F<=100, 1, 0)) %>%
+  mutate(temp_85_90=ifelse(temp_F> 85 & temp_F<=90, 1, 0)) %>%
+  mutate(temp_80_85=ifelse(temp_F>80 & temp_F<=85, 1, 0)) %>%
+  mutate(temp_70_80=ifelse(temp_F>70 & temp_F<=80, 1, 0)) %>%
+  mutate(temp_60_70=ifelse(temp_F>60 & temp_F<=70, 1, 0)) %>%
+  mutate(temp_under_60=ifelse(temp_F<= 60, 1, 0))
 
-## Question 10: In a difference-in-differences (DiD) model, what is the treatment GROUP?
+model2<-felm(call_bin ~ temp_over_100 + temp_90_100 + temp_85_90 + temp_80_85 + temp_70_80 + temp_60_70 + temp_under_60 +
+               daytime + 
+               temp_over_100:daytime + temp_90_100:daytime + temp_85_90:daytime + temp_80_85:daytime + temp_70_80:daytime + temp_60_70:daytime + temp_under_60:daytime| 
+               policeDistrict + year + month + dow, data=df3)
+```
 
-Answer:
+    Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+    rank-deficient or not positive definite
 
-## Question 11: In a DiD model, what are the control groups?
+``` r
+summary(model2)
+```
 
-Answer:
+    Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+    rank-deficient or not positive definite
 
-## Question 12: What is the DiD regression equation that will answer your research question?
 
-## Question 13: Run your DiD regressions below. What are the results of the DiD regression?
+    Call:
+       felm(formula = call_bin ~ temp_over_100 + temp_90_100 + temp_85_90 +      temp_80_85 + temp_70_80 + temp_60_70 + temp_under_60 + daytime +      temp_over_100:daytime + temp_90_100:daytime + temp_85_90:daytime +      temp_80_85:daytime + temp_70_80:daytime + temp_60_70:daytime +      temp_under_60:daytime | policeDistrict + year + month + dow,      data = df3) 
 
-## Question 14: What are the next steps of your research?
+    Residuals:
+         Min       1Q   Median       3Q      Max 
+    -0.17697 -0.09818 -0.07249 -0.04738  1.00262 
+
+    Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)
+    temp_over_100                NaN         NA     NaN      NaN
+    temp_90_100           -0.0206669  0.0208660  -0.990    0.322
+    temp_85_90            -0.0085362  0.0229053  -0.373    0.709
+    temp_80_85            -0.0424379  0.0547127  -0.776    0.438
+    temp_70_80             0.0182557  0.0177363   1.029    0.303
+    temp_60_70             0.0124341  0.0147016   0.846    0.398
+    temp_under_60                NaN         NA     NaN      NaN
+    daytime                0.0019254  0.0237888   0.081    0.935
+    temp_over_100:daytime        NaN         NA     NaN      NaN
+    temp_90_100:daytime          NaN         NA     NaN      NaN
+    temp_85_90:daytime           NaN         NA     NaN      NaN
+    temp_80_85:daytime    -0.0002367  0.0613340  -0.004    0.997
+    temp_70_80:daytime    -0.0310445  0.0353878  -0.877    0.380
+    temp_60_70:daytime    -0.0434896  0.0340055  -1.279    0.201
+    temp_under_60:daytime -0.0253033  0.0253106  -1.000    0.317
+
+    Residual standard error: 0.2689 on 8414 degrees of freedom
+    Multiple R-squared(full model): 0.01537   Adjusted R-squared: 0.01104 
+    Multiple R-squared(proj model): 0.003143   Adjusted R-squared: -0.001241 
+    F-statistic(full model):3.549 on 37 and 8414 DF, p-value: 2.313e-12 
+    F-statistic(proj model): 1.769 on 15 and 8414 DF, p-value: 0.03302 
+    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+
+## Question 10: What are the next steps of your research?
+
+- Identify factors that impacts temperature and number of calls at the
+  same time.
+
+  - precipitation
+
+  - trees
+
+  - air quality
 
 Step 9: Change the document format to gfm
 

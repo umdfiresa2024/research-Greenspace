@@ -84,7 +84,7 @@ summary(model1)
 Answer:
 
 $$
-callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \epsilon_{pdt}
+callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \gamma_p + \eta_d + \theta_{dayofweek} + \omega_{month} + \pi_year+\epsilon_{pdt}
 $$
 
 Where $callscount$ represents the outcome variable that shows whether there a call from police district \$p\$, on day \$d\$, at time of day \$t\$.
@@ -110,26 +110,40 @@ Answer:
 #install.packages("lfe")
 library("lfe")
 
-model2<-felm(temp_F ~ call_bin | policeDistrict + daytime + year + month + dow, data=df2)
+model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
+               policeDistrict + year + month + dow, data=df2)
 
 summary(model2)
 ```
 
-# Questions for Week 5
+```{r}
 
-## Question 10: In a difference-in-differences (DiD) model, what is the treatment GROUP?
+df3<-df2 %>%
+  mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
+  mutate(temp_90_100=ifelse(temp_F>90 & temp_F<=100, 1, 0)) %>%
+  mutate(temp_85_90=ifelse(temp_F> 85 & temp_F<=90, 1, 0)) %>%
+  mutate(temp_80_85=ifelse(temp_F>80 & temp_F<=85, 1, 0)) %>%
+  mutate(temp_70_80=ifelse(temp_F>70 & temp_F<=80, 1, 0)) %>%
+  mutate(temp_60_70=ifelse(temp_F>60 & temp_F<=70, 1, 0)) %>%
+  mutate(temp_under_60=ifelse(temp_F<= 60, 1, 0))
 
-Answer:
+model2<-felm(call_bin ~ temp_over_100 + temp_90_100 + temp_85_90 + temp_80_85 + temp_70_80 + temp_60_70 + temp_under_60 +
+               daytime + 
+               temp_over_100:daytime + temp_90_100:daytime + temp_85_90:daytime + temp_80_85:daytime + temp_70_80:daytime + temp_60_70:daytime + temp_under_60:daytime| 
+               policeDistrict + year + month + dow, data=df3)
 
-## Question 11: In a DiD model, what are the control groups?
+summary(model2)
+```
 
-Answer:
+## Question 10: What are the next steps of your research?
 
-## Question 12: What is the DiD regression equation that will answer your research question?
+-   Identify factors that impacts temperature and number of calls at the same time.
 
-## Question 13: Run your DiD regressions below. What are the results of the DiD regression?
+    -   precipitation
 
-## Question 14: What are the next steps of your research?
+    -   trees
+
+    -   air quality
 
 Step 9: Change the document format to gfm
 
