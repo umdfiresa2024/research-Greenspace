@@ -64,9 +64,37 @@ Answer: call_bin
 Step 7: Create a boxplot to visualize the distribution of the outcome variable under treatment and no treatment.
 
 ```{r}
-ggplot(df2, aes(x=temp_F)) +
-  geom_boxplot() +
-  facet_wrap(~call_bin)
+# New data frame with a column that stores the tempurature ranges.
+dfTest <- df2 %>%
+  mutate(tempCatagories = cut(temp_F, 
+                              breaks = c(-Inf, 60, 65, 70, 75, 80, 85, 90, 95, 100, Inf), 
+                              labels = c("< 60", "60-65", "65-70", "70-75", "75-80", 
+                                         "80-85", "85-90", "90-95", "95-100", "> 100"),
+                              right = TRUE))
+#ggplot(df2, aes(x=temp_F)) +
+  #geom_boxplot() +
+  #facet_wrap(~call_bin)
+
+
+# Summarize the data by tempCatagories and year
+dfTest <- dfTest %>%
+  group_by(tempCatagories, year) %>%
+  summarise(
+    calls = sum(call_bin),          # Total number of calls
+    days = n()                       # Count the number of days in each group
+  ) %>%
+  mutate(avg_calls = calls / days)   # Calculate average calls per day
+
+# Create the line plot with multiple lines for each year
+ggplot(dfTest, aes(x = tempCatagories, y = avg_calls, group = year, color = as.factor(year))) +
+  geom_line(size = 1) +
+  geom_point() + # Optional: Adds points to the lines for better visibility
+  labs(title = "Average Number of Calls per Temperature Range (by Year)",
+       x = "Temperature Categories",
+       y = "Average Number of Calls",
+       color = "Year") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate the x-axis labels for readability
 ```
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
@@ -120,16 +148,19 @@ summary(model2)
 
 df3<-df2 %>%
   mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
-  mutate(temp_90_100=ifelse(temp_F>90 & temp_F<=100, 1, 0)) %>%
+  mutate(temp_95_100=ifelse(temp_F> 95 & temp_F<=100, 1, 0)) %>%
+  mutate(temp_90_95=ifelse(temp_F> 90 & temp_F<=95, 1, 0)) %>%
   mutate(temp_85_90=ifelse(temp_F> 85 & temp_F<=90, 1, 0)) %>%
-  mutate(temp_80_85=ifelse(temp_F>80 & temp_F<=85, 1, 0)) %>%
-  mutate(temp_70_80=ifelse(temp_F>70 & temp_F<=80, 1, 0)) %>%
-  mutate(temp_60_70=ifelse(temp_F>60 & temp_F<=70, 1, 0)) %>%
+  mutate(temp_80_85=ifelse(temp_F> 80 & temp_F<=85, 1, 0)) %>%
+  mutate(temp_75_80=ifelse(temp_F> 75 & temp_F<=80, 1, 0)) %>%
+  mutate(temp_70_75=ifelse(temp_F> 70 & temp_F<=75, 1, 0)) %>%
+  mutate(temp_65_70=ifelse(temp_F> 65 & temp_F<=70, 1, 0)) %>%
+  mutate(temp_60_65=ifelse(temp_F> 60 & temp_F<=65, 1, 0)) %>%
   mutate(temp_under_60=ifelse(temp_F<= 60, 1, 0))
 
-model2<-felm(call_bin ~ temp_over_100 + temp_90_100 + temp_85_90 + temp_80_85 + temp_70_80 + temp_60_70 + temp_under_60 +
+model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 +
                daytime + 
-               temp_over_100:daytime + temp_90_100:daytime + temp_85_90:daytime + temp_80_85:daytime + temp_70_80:daytime + temp_60_70:daytime + temp_under_60:daytime| 
+               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
                policeDistrict + year + month + dow, data=df3)
 
 summary(model2)
@@ -154,3 +185,23 @@ Step 11: Render the document. README.md file should be created after this proces
 Step 12: Push the document back to GitHub and observe your beautiful document in your repository!
 
 Step 13: If your team has a complete dataframe that includes both the treated and outcome variable, you are done with the assignment. If not, make a research plan in Notion to collect data on the outcome and treatment variable and combine it into one dataframe.
+
+Data Description:
+
+-   Outcome variable: whether there was a call or not per day.
+
+-   Treatment variable: temperature
+
+-   Frequency and geographical Unit: daily day and night and police district
+
+-   Treated Group: \# of call on a hot weekday in a specific month in a police district
+
+-   Untreated Group:# of call on a cool weekday in a specific month in a police district
+
+Future Plans:
+
+-   Alter the graph so that it shows the relationship between specific temperature periods to the number of calls
+
+-   Incorporate methods and strategies from official articles into our research paper.
+
+-   Control for trees, precipitation and air quality
