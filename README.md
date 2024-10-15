@@ -97,46 +97,43 @@ Step 7: Create a boxplot to visualize the distribution of the outcome
 variable under treatment and no treatment.
 
 ``` r
-# New data frame with a column that stores the tempurature ranges.
-dfTest <- df2 %>%
-  mutate(tempCatagories = cut(temp_F, 
-                              breaks = c(-Inf, 60, 65, 70, 75, 80, 85, 90, 95, 100, Inf), 
-                              labels = c("< 60", "60-65", "65-70", "70-75", "75-80", 
-                                         "80-85", "85-90", "90-95", "95-100", "> 100"),
-                              right = TRUE))
-#ggplot(df2, aes(x=temp_F)) +
-  #geom_boxplot() +
-  #facet_wrap(~call_bin)
+# histogram or scatterplots
+# total number of calls
+# x -> temp_F, y -> callscount (avg for scatterplot)
+# groupBy policeDistrict
 
+#----------------------------------------------------------------------------------------------
+df2 <- df2 %>%
+  mutate(tempCatagories = ifelse(temp_F < 60, 55,
+                          ifelse(temp_F >= 60 & temp_F < 65, 60,
+                          ifelse(temp_F >= 65 & temp_F < 70, 65,
+                          ifelse(temp_F >= 70 & temp_F < 75, 70,
+                          ifelse(temp_F >= 75 & temp_F < 80, 75,
+                          ifelse(temp_F >= 80 & temp_F < 85, 80,
+                          ifelse(temp_F >= 85 & temp_F < 90, 85,
+                          ifelse(temp_F >= 90 & temp_F < 95, 90,
+                          ifelse(temp_F >= 95 & temp_F < 100, 95, 
+                          100))))))))))
 
-# Summarize the data by tempCatagories and year
-dfTest <- dfTest %>%
-  group_by(tempCatagories, year) %>%
-  summarise(
-    calls = sum(call_bin),          # Total number of calls
-    days = n()                       # Count the number of days in each group
-  ) %>%
-  mutate(avg_calls = calls / days)   # Calculate average calls per day
+avg_df <- df2 %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarise(avg_calls = mean(callscount, na.rm = TRUE))
 ```
 
-    `summarise()` has grouped output by 'tempCatagories'. You can override using
+    `summarise()` has grouped output by 'policeDistrict'. You can override using
     the `.groups` argument.
 
 ``` r
-# Create the line plot with multiple lines for each year
-ggplot(dfTest, aes(x = tempCatagories, y = avg_calls, group = year, color = as.factor(year))) +
-  geom_line(size = 1) +
-  geom_point() + # Optional: Adds points to the lines for better visibility
-  labs(title = "Average Number of Calls per Temperature Range (by Year)",
-       x = "Temperature Categories",
-       y = "Average Number of Calls",
-       color = "Year") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate the x-axis labels for readability
+# Step 2: Create the scatter plot
+ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+  geom_point(size = 2) + 
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District",
+       x = "Temperature Range (F)", 
+       y = "Average Number of Calls")
 ```
 
-    Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ℹ Please use `linewidth` instead.
+    `geom_smooth()` using formula = 'y ~ x'
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-1.png)
 
@@ -266,6 +263,16 @@ model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
     rank-deficient or not positive definite
 
 ``` r
+model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 +
+               daytime + 
+               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               policeDistrict + year + dow, data=df3)
+```
+
+    Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+    rank-deficient or not positive definite
+
+``` r
 summary(model2)
 ```
 
@@ -282,16 +289,16 @@ summary(model2)
 
     Coefficients:
                             Estimate Std. Error t value Pr(>|t|)  
-    temp_over_100                NaN         NA     NaN      NaN  
-    temp_95_100           -0.0059708  0.0229500  -0.260   0.7947  
-    temp_90_95            -0.0331189  0.0226719  -1.461   0.1441  
-    temp_85_90            -0.0083782  0.0229436  -0.365   0.7150  
-    temp_80_85            -0.0679098  0.0569258  -1.193   0.2329  
-    temp_75_80            -0.0260353  0.0257558  -1.011   0.3121  
-    temp_70_75             0.0105107  0.0254167   0.414   0.6792  
-    temp_65_70            -0.0118233  0.0255827  -0.462   0.6440  
-    temp_60_65            -0.0127652  0.0265700  -0.480   0.6309  
-    temp_under_60         -0.0242323  0.0254951  -0.950   0.3419  
+    temp_over_100          0.0127652  0.0265700   0.480   0.6309  
+    temp_95_100            0.0067944  0.0227815   0.298   0.7655  
+    temp_90_95            -0.0203537  0.0218169  -0.933   0.3509  
+    temp_85_90             0.0043870  0.0208039   0.211   0.8330  
+    temp_80_85            -0.0551446  0.0551810  -0.999   0.3177  
+    temp_75_80            -0.0132701  0.0224411  -0.591   0.5543  
+    temp_70_75             0.0232759  0.0213345   1.091   0.2753  
+    temp_65_70             0.0009419  0.0198711   0.047   0.9622  
+    temp_60_65                   NaN         NA     NaN      NaN  
+    temp_under_60         -0.0114671  0.0171897  -0.667   0.5047  
     daytime               -0.0231241  0.0094226  -2.454   0.0141 *
     temp_over_100:daytime        NaN         NA     NaN      NaN  
     temp_95_100:daytime          NaN         NA     NaN      NaN  
@@ -311,6 +318,65 @@ summary(model2)
     F-statistic(full model):3.285 on 42 and 8409 DF, p-value: 4.965e-12 
     F-statistic(proj model): 1.659 on 20 and 8409 DF, p-value: 0.03245 
     *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+
+``` r
+summary(model3)
+```
+
+    Warning in chol.default(mat, pivot = TRUE, tol = tol): the matrix is either
+    rank-deficient or not positive definite
+
+
+    Call:
+       felm(formula = call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 +      temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 +      temp_60_65 + temp_under_60 + daytime + temp_over_100:daytime +      temp_95_100:daytime + temp_90_95:daytime + temp_85_90:daytime +      temp_80_85:daytime + temp_75_80:daytime + temp_70_75:daytime +      temp_65_70:daytime + temp_60_65:daytime + temp_under_60 |      policeDistrict + year + dow, data = df3) 
+
+    Residuals:
+         Min       1Q   Median       3Q      Max 
+    -0.18766 -0.09841 -0.07292 -0.04760  1.00624 
+
+    Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)   
+    temp_over_100          0.0072906  0.0228180   0.320  0.74935   
+    temp_95_100                  NaN         NA     NaN      NaN   
+    temp_90_95            -0.0267122  0.0183335  -1.457  0.14515   
+    temp_85_90            -0.0007211  0.0179466  -0.040  0.96795   
+    temp_80_85            -0.0583548  0.0552312  -1.057  0.29074   
+    temp_75_80            -0.0182522  0.0221302  -0.825  0.40953   
+    temp_70_75             0.0167838  0.0216431   0.775  0.43808   
+    temp_65_70            -0.0063940  0.0212525  -0.301  0.76353   
+    temp_60_65            -0.0059151  0.0212756  -0.278  0.78100   
+    temp_under_60         -0.0129022  0.0152976  -0.843  0.39902   
+    daytime               -0.0238868  0.0089251  -2.676  0.00746 **
+    temp_over_100:daytime        NaN         NA     NaN      NaN   
+    temp_95_100:daytime          NaN         NA     NaN      NaN   
+    temp_90_95:daytime           NaN         NA     NaN      NaN   
+    temp_85_90:daytime           NaN         NA     NaN      NaN   
+    temp_80_85:daytime     0.0250467  0.0552642   0.453  0.65040   
+    temp_75_80:daytime     0.0035914  0.0241887   0.148  0.88197   
+    temp_70_75:daytime     0.0001120  0.0247977   0.005  0.99640   
+    temp_65_70:daytime    -0.0086519  0.0235770  -0.367  0.71366   
+    temp_60_65:daytime    -0.0113546  0.0268300  -0.423  0.67215   
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+    Residual standard error: 0.2688 on 8420 degrees of freedom
+    Multiple R-squared(full model): 0.01541   Adjusted R-squared: 0.01179 
+    Multiple R-squared(proj model): 0.003947   Adjusted R-squared: 0.0002796 
+    F-statistic(full model):4.252 on 31 and 8420 DF, p-value: 2.93e-14 
+    F-statistic(proj model): 1.668 on 20 and 8420 DF, p-value: 0.031 
+    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+
+For adding the holidays column into the data frame:
+
+``` r
+#included holidays: new years, mlk, valentines (sunday), presidents, easter (sunday), mother's (sunday), memorial, independence, labor, halloween, election, thanksgiving, christmas
+
+holidays <- as.Date(c(
+"2021-01-01", "2021-1-18", "2021-2-14", "2021-2-15", "2021-4-4", "2021-5-9", "2021-5-31", "2021-7-4", "2021-9-6", "2021-10-31", "2021-11-2", "2021-11-25", "2021-12-25", "2022-01-01", "2022-1-17", "2022-2-14", "2022-2-21", "2021-4-17", "2021-5-8", "2021-5-30", "2021-7-4", "2021-9-5", "2021-10-31", "2021-11-8", "2021-11-24", "2021-12-25", "2023-01-01", "2023-1-16", "2023-2-14", "2023-2-20", "2023-4-9", "2023-5-14", "2021-5-29", "2023-7-4", "2023-9-4", "2023-10-31", "2023-11-7", "2023-11-23", "2023-12-25"))
+
+df3 <- df3 %>%
+  mutate(holiday_bin = ifelse(date %in% holidays, 1, 0))
+```
 
 ## Question 10: What are the next steps of your research?
 

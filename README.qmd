@@ -64,37 +64,39 @@ Answer: call_bin
 Step 7: Create a boxplot to visualize the distribution of the outcome variable under treatment and no treatment.
 
 ```{r}
-# New data frame with a column that stores the tempurature ranges.
-dfTest <- df2 %>%
-  mutate(tempCatagories = cut(temp_F, 
-                              breaks = c(-Inf, 60, 65, 70, 75, 80, 85, 90, 95, 100, Inf), 
-                              labels = c("< 60", "60-65", "65-70", "70-75", "75-80", 
-                                         "80-85", "85-90", "90-95", "95-100", "> 100"),
-                              right = TRUE))
-#ggplot(df2, aes(x=temp_F)) +
-  #geom_boxplot() +
-  #facet_wrap(~call_bin)
+
+# histogram or scatterplots
+# total number of calls
+# x -> temp_F, y -> callscount (avg for scatterplot)
+# groupBy policeDistrict
+
+#----------------------------------------------------------------------------------------------
+df2 <- df2 %>%
+  mutate(tempCatagories = ifelse(temp_F < 60, 55,
+                          ifelse(temp_F >= 60 & temp_F < 65, 60,
+                          ifelse(temp_F >= 65 & temp_F < 70, 65,
+                          ifelse(temp_F >= 70 & temp_F < 75, 70,
+                          ifelse(temp_F >= 75 & temp_F < 80, 75,
+                          ifelse(temp_F >= 80 & temp_F < 85, 80,
+                          ifelse(temp_F >= 85 & temp_F < 90, 85,
+                          ifelse(temp_F >= 90 & temp_F < 95, 90,
+                          ifelse(temp_F >= 95 & temp_F < 100, 95, 
+                          100))))))))))
+
+avg_df <- df2 %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarise(avg_calls = mean(callscount, na.rm = TRUE))
+
+# Step 2: Create the scatter plot
+ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+  geom_point(size = 2) + 
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District",
+       x = "Temperature Range (F)", 
+       y = "Average Number of Calls")
 
 
-# Summarize the data by tempCatagories and year
-dfTest <- dfTest %>%
-  group_by(tempCatagories, year) %>%
-  summarise(
-    calls = sum(call_bin),          # Total number of calls
-    days = n()                       # Count the number of days in each group
-  ) %>%
-  mutate(avg_calls = calls / days)   # Calculate average calls per day
 
-# Create the line plot with multiple lines for each year
-ggplot(dfTest, aes(x = tempCatagories, y = avg_calls, group = year, color = as.factor(year))) +
-  geom_line(size = 1) +
-  geom_point() + # Optional: Adds points to the lines for better visibility
-  labs(title = "Average Number of Calls per Temperature Range (by Year)",
-       x = "Temperature Categories",
-       y = "Average Number of Calls",
-       color = "Year") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate the x-axis labels for readability
 ```
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
@@ -163,7 +165,26 @@ model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
                temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
                policeDistrict + year + month + dow, data=df3)
 
+model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 +
+               daytime + 
+               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               policeDistrict + year + dow, data=df3)
+
 summary(model2)
+summary(model3)
+```
+
+For adding the holidays column into the data frame:
+
+```{r}
+
+#included holidays: new years, mlk, valentines (sunday), presidents, easter (sunday), mother's (sunday), memorial, independence, labor, halloween, election, thanksgiving, christmas
+
+holidays <- as.Date(c(
+"2021-01-01", "2021-1-18", "2021-2-14", "2021-2-15", "2021-4-4", "2021-5-9", "2021-5-31", "2021-7-4", "2021-9-6", "2021-10-31", "2021-11-2", "2021-11-25", "2021-12-25", "2022-01-01", "2022-1-17", "2022-2-14", "2022-2-21", "2021-4-17", "2021-5-8", "2021-5-30", "2021-7-4", "2021-9-5", "2021-10-31", "2021-11-8", "2021-11-24", "2021-12-25", "2023-01-01", "2023-1-16", "2023-2-14", "2023-2-20", "2023-4-9", "2023-5-14", "2021-5-29", "2023-7-4", "2023-9-4", "2023-10-31", "2023-11-7", "2023-11-23", "2023-12-25"))
+
+df3 <- df3 %>%
+  mutate(holiday_bin = ifelse(date %in% holidays, 1, 0))
 ```
 
 ## Question 10: What are the next steps of your research?
