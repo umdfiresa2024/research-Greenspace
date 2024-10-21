@@ -1,3 +1,5 @@
+# Extends the exising panel by adding pollution, weather, and greeness
+
 library("tidyverse")
 panel<-read.csv("panel.csv")
 
@@ -15,7 +17,15 @@ pollution <- rbind(pm21, pm22, pm23) %>%
 panel_ext<-left_join(x=panel, y=pollution, by="date")
 ### }}}
 
-### TODO: Add Weather ###
+### TODO: Add Weather ### {{{
+weather<-read.csv("data/NCDC_weather.csv") %>%
+    select(everything() & !(STATION | NAME)) %>% # remove irrelvent columns
+    rename("date"="DATE", #TODO: rename the rest of the columns
+           "avg. daily windspeed (mi/hr)"="AWND") 
+    # TODO: make the top wind vars better, and handle NAs
+panel_ext<-left_join(x=panel, y=weather, by="date")
+
+### }}}
 
 ### TODO: Add Green Coverage ###
 
