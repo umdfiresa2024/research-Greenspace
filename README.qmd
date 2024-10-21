@@ -8,6 +8,8 @@ Step 1. Install necessary packages.
 
 ```{r}
 #| eval: false
+#| warning: false
+#| message: false
 install.packages("tidyverse")
 install.packages("kableExtra")
 ```
@@ -15,6 +17,8 @@ install.packages("kableExtra")
 Step 2. Declare that you will use these packages in this session.
 
 ```{r}
+#| warning: false
+#| message: false
 library("tidyverse")
 library("kableExtra")
 ```
@@ -144,7 +148,8 @@ Year: controls any differences that might have occurred one year to another
 Answer:
 
 ```{r}
-
+#| warning: false
+#| message: false
 #install.packages("lfe")
 library("lfe")
 
@@ -154,9 +159,7 @@ model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime|
 summary(model2)
 ```
 
-```{r}
-
-df3<-df2 %>%
+```{df3<-df2 %>%}
   mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
   mutate(temp_95_100=ifelse(temp_F> 95 & temp_F<=100, 1, 0)) %>%
   mutate(temp_90_95=ifelse(temp_F> 90 & temp_F<=95, 1, 0)) %>%
@@ -185,7 +188,8 @@ summary(model3)
 For adding the holidays column into the data frame:
 
 ```{r}
-
+#| warning: false
+#| message: false
 #2021 - 2022 (from the website: https://patch.com/maryland/baltimore/back-school-baltimore-city #-2021-22-school-calendar) (Not full but )
 #2022 - 2023
 #2023 - 2024 (upto Dec 31)
