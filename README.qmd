@@ -96,7 +96,15 @@ ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) +
        y = "Average Number of Calls")
 
 
+#-------#
+ggplot(df2, aes(x = temp_F, fill = policeDistrict)) +
+  geom_histogram(binwidth = 5, position = "identity", alpha = 0.7) +
+  labs(x = "Temperature (°F)", y = "Number of Calls", fill = "Police District") +
+  ggtitle("Histogram of Temperature by Number of Calls by Police District")
+#-------#
 
+ggplot(df2, aes(x=policeDistrict, y=temp_F)) + 
+  geom_bar(stat = "identity")
 ```
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
@@ -193,6 +201,18 @@ holidays <- as.Date(c(
 
 df3 <- df3 %>%
   mutate(holiday_bin = ifelse(date %in% holidays, 1, 0))
+
+
+#dayOfTheWeek Holiday Results
+
+model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               policeDistrict + year + month + dow, data=df3)
+
+model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + daytime + holiday_bin + holiday_bin:daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               policeDistrict + year + dow, data=df3)
+
+summary(model2)
+summary(model3)
 ```
 
 ## Question 10: What are the next steps of your research?
