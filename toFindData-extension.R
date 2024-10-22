@@ -12,21 +12,19 @@ pm23<-read.csv("data/EPA/pm25_2023.csv")
 pollution <- rbind(pm21, pm22, pm23) %>%
     mutate(date=sapply(mdy(Date), function(d) sprintf("%s", d))) %>% # trust
     select(date, Daily.Mean.PM2.5.Concentration) %>%
-    rename("Daily.Mean.PM25.ug/m3.LC" = "Daily.Mean.PM2.5.Concentration")
-# TODO: handle NA, because pollution is not reported sometimes for some reason
+    rename("PM25" = "Daily.Mean.PM2.5.Concentration")
 panel_ext<-left_join(x=panel, y=pollution, by="date")
 ### }}}
 
-### TODO: Add Weather ### {{{
+### Add Weather ### {{{
 weather<-read.csv("data/NCDC_weather.csv") %>%
     select(everything() & !(STATION | NAME)) %>% # remove irrelvent columns
-    rename("date"="DATE", #TODO: rename the rest of the columns
-           "avg. daily windspeed (mi/hr)"="AWND") 
-    # TODO: make the top wind vars better, and handle NAs
-panel_ext<-left_join(x=panel, y=weather, by="date")
+    rename("date"="DATE") 
+    weather[is.na(weather)] <-0 # clear NAs
+panel_ext2<-left_join(x=panel_ext, y=weather, by="date")
 
 ### }}}
 
 ### TODO: Add Green Coverage ###
 
-write.csv(panel_ext, "panel_ext.csv", row.names=FALSE)
+write.csv(panel_ext2, "panel_ext.csv", row.names=FALSE)
