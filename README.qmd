@@ -99,17 +99,20 @@ ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) +
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 
-
-#-------#
-ggplot(df2, aes(x = temp_F, fill = policeDistrict)) +
-  geom_histogram(binwidth = 5, position = "identity", alpha = 0.7) +
-  labs(x = "Temperature (°F)", y = "Number of Calls", fill = "Police District") +
-  ggtitle("Histogram of Temperature by Number of Calls by Police District")
 #-------#
 
-ggplot(df2, aes(x=policeDistrict, y=temp_F)) + 
-  geom_bar(stat = "identity")
+df_summary <- df2 %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarize(total_callscount = sum(callscount))
+
+ggplot(df_summary, aes(x = tempCatagories, y = total_callscount)) + 
+    geom_bar(stat="identity") +
+    facet_wrap((~ as.character(policeDistrict)))
+
 ```
+
+\
+\
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
 
@@ -132,6 +135,18 @@ $$
 Where $callscount$ represents the outcome variable that shows whether there a call from police district \$p\$, on day \$d\$, at time of day \$t\$.
 
 Where $temp$ determines the temperature in Fahrenheit.
+
+Data Description:
+
+-   Outcome variable: whether there was a call or not per day.
+
+-   Treatment variable: temperature
+
+-   Frequency and geographical Unit: daily day and night and police district
+
+-   Treated Group: \# of call on a hot weekday in a specific month in a police district
+
+-   Untreated Group:# of call on a cool weekday in a specific month in a police district
 
 ## Question 8: What fixed effects can be included in the regression? What does each fixed effects control for? Please include a new equation that incorporates the fixed effects.
 
@@ -159,7 +174,12 @@ model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime|
 summary(model2)
 ```
 
-```{df3<-df2 %>%}
+```{r}
+#| warning: false
+#| message: false
+
+# for the temperature range
+df3<-df2 %>%
   mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
   mutate(temp_95_100=ifelse(temp_F> 95 & temp_F<=100, 1, 0)) %>%
   mutate(temp_90_95=ifelse(temp_F> 90 & temp_F<=95, 1, 0)) %>%
@@ -171,25 +191,8 @@ summary(model2)
   mutate(temp_60_65=ifelse(temp_F> 60 & temp_F<=65, 1, 0)) %>%
   mutate(temp_under_60=ifelse(temp_F<= 60, 1, 0))
 
-model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 +
-               daytime + 
-               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               policeDistrict + year + month + dow, data=df3)
+#-------#
 
-model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 +
-               daytime + 
-               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               policeDistrict + year + dow, data=df3)
-
-summary(model2)
-summary(model3)
-```
-
-For adding the holidays column into the data frame:
-
-```{r}
-#| warning: false
-#| message: false
 #2021 - 2022 (from the website: https://patch.com/maryland/baltimore/back-school-baltimore-city #-2021-22-school-calendar) (Not full but )
 #2022 - 2023
 #2023 - 2024 (upto Dec 31)
@@ -203,9 +206,11 @@ holidays <- as.Date(c(
 
 "2023-9-4", "2023-10-20", "2023-11-22", "2023-11-23", "2023-11-24", "2023-12-22", "2023-12-23", "2023-12-24", "2023-12-25", "2023-12-26", "2023-12-27", "2023-12-28", "2023-12-29", "2023-12-30", "2023-12-31"))
 
+#For adding the holidays column into the data frame
 df3 <- df3 %>%
   mutate(holiday_bin = ifelse(date %in% holidays, 1, 0))
 
+#-------#
 
 #dayOfTheWeek Holiday Results
 
@@ -220,6 +225,14 @@ summary(model3)
 ```
 
 ## Question 10: What are the next steps of your research?
+
+Future Plans:
+
+-   Alter the graph so that it shows the relationship between specific temperature periods to the number of calls
+
+-   Incorporate methods and strategies from official articles into our research paper.
+
+-   Control for trees, precipitation and air quality
 
 -   Identify factors that impacts temperature and number of calls at the same time.
 
@@ -238,23 +251,3 @@ Step 11: Render the document. README.md file should be created after this proces
 Step 12: Push the document back to GitHub and observe your beautiful document in your repository!
 
 Step 13: If your team has a complete dataframe that includes both the treated and outcome variable, you are done with the assignment. If not, make a research plan in Notion to collect data on the outcome and treatment variable and combine it into one dataframe.
-
-Data Description:
-
--   Outcome variable: whether there was a call or not per day.
-
--   Treatment variable: temperature
-
--   Frequency and geographical Unit: daily day and night and police district
-
--   Treated Group: \# of call on a hot weekday in a specific month in a police district
-
--   Untreated Group:# of call on a cool weekday in a specific month in a police district
-
-Future Plans:
-
--   Alter the graph so that it shows the relationship between specific temperature periods to the number of calls
-
--   Incorporate methods and strategies from official articles into our research paper.
-
--   Control for trees, precipitation and air quality
