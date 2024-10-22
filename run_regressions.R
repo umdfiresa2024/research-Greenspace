@@ -5,7 +5,8 @@ df2<-df %>%
   mutate(call_bin = ifelse(callscount>0, 1, 0)) %>%
   mutate(date = as.Date(date)) %>%
   mutate(month = month(date)) %>%
-  mutate(dow = weekdays(date))
+  mutate(dow = weekdays(date)) %>%
+  mutate(year = year(date))
 
 df3<-df2 %>%
   mutate(temp_over_100=ifelse(temp_F>100, 1, 0)) %>%
@@ -47,37 +48,9 @@ df4 <- df3 %>%
 library("lfe")
 
 summary(model1<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
-                       temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
-                       temp_under_60 + 
-                       holiday_bin + holiday_bin:daytime + daytime | 
-                       policeDistrict + year + dow_month, data=df4))
-
-summary(model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
-               temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
-               temp_under_60 + 
-               holiday_bin + holiday_bin:daytime + daytime + 
-               temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + 
-               temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + 
-               temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + 
-               temp_under_60: daytime | 
-               policeDistrict + year + dow_month, data=df4))
-
-library("bife")
-
-summary(m3<-bife(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
-    temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
-    holiday_bin + holiday_bin:daytime + daytime + as.factor(dow_month) | 
-    policeDistrict,
-  data  = df4,
-  model = "logit"
-))
-
-summary(m4<-bife(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
-                   temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
-                   holiday_bin + holiday_bin:daytime + daytime + as.factor(dow_month) | 
-                   policeDistrict,
-                 data  = df4,
-                 model = "probit"))
+                       temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 +
+                       holiday_bin  | 
+                       policeDistrict + year + dow_month, data=df4)
 
 library("fixest")
 summary(m5 <- feglm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
@@ -90,3 +63,19 @@ summary(m6 <- feglm(callscount ~ temp_over_100 + temp_95_100 + temp_90_95 + temp
                       holiday_bin + as.factor(dow_month) | 
                       policeDistrict, data=df4, "poisson"))
 
+#regress by season
+df5<-df4 |>
+  filter(month==1 | month==2 | month==12 | month==11 | month==10 | month==3)
+
+summary(m5 <- feglm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
+                      temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
+                      holiday_bin + as.factor(dow_month) | 
+                      policeDistrict, data=df5, "logit"))
+
+df5<-df4 |>
+  filter(month>=4 & month<=9)
+
+summary(m5 <- feglm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
+                      temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + 
+                      holiday_bin + as.factor(dow_month) | 
+                      policeDistrict, data=df5, "logit"))
