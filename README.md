@@ -45,6 +45,87 @@ kable(head(df2))
 |       0 | Central        | 2021-06-19 |     2021169 | 2021 | 169 | 292.4600 |          0 | 66.75800 |        0 |     6 | Saturday |
 |       0 | Central        | 2021-06-26 |     2021176 | 2021 | 176 | 292.9914 |          0 | 67.71457 |        0 |     6 | Saturday |
 
+## Introduction & Literature Review:
+
+Understanding how temperature affects mental health is crucial for
+society. With rising global temperatures, we will have to be prepared
+for any impacts that may cause. The years from 2013 to 2023 have been
+the warmest to date, with 2023 having the highest surface temperature
+ever recorded (NASA, n.d). High temperatures were studied in Baltimore
+city through in depth interviews where it was found that at higher heats
+people were more prone to mental health problems such as depression and
+anxiety. Especially disadvantaged individuals such as people who are
+low-income, have disabilities, are homeless, pregnant, elderly people
+and children (Diallo et al., 2024). If we were to discover more impacts
+that temperature has on individuals, it could guide urban planners to
+plan future cities so that they would include public spaces throughout
+the city. Additionally, by understanding the psychological effects of
+temperature, governments and healthcare providers can better prepare
+interventions, such as improving access to mental health services during
+extreme temperatures. This research could also lead to targeted policies
+that aim to mitigate the mental health impacts of climate change,
+ultimately improving societal well-being.
+
+This research project aims to provide the most concentrated area example
+of the impacts of temperature on mental health. While existing studies
+have found links between mental health worsening and high temperatures,
+most have done so for the whole country of the US by county, which makes
+it more difficult to definitively control for other factors (Burke et
+al., 2018; Srivastava & Mullins., 2024). The data used by Burke et
+al. (2018) is based on suicide rates and is from 1968–2004 in the US and
+1990-2010 in Mexico by county and analyzed monthly. They found a 0.7%
+suicide rate increase in the US per 1.8 degrees Fahrenheit increase in
+monthly temperature. 
+
+Srivastava & Mullins (2024) compared the daily frequencies of crisis
+line conversations from each county with local average daily
+temperatures. They found an 8% increase in crisis line conversations on
+days exceeding 86 degrees Fahrenheit compared to days between 64.4 to
+69.8 degrees Fahrenheit. 
+
+Besides existing studies on the link between temperatures and mental
+health, there are many studies that looked at the impact of temperature
+on crime rates. Heilmann et al. (2021) discovered that crime rates in
+Los Angeles police districts increase 1.72% when daily temperature
+exceeds 75 and 1.90% when daily temperature exceeds 75 and 90 degrees
+Fahrenheit. 
+
+Our study will differ from existing studies on temperature and mental
+health on several key points. We will be analyzing a more controlled
+location and group, focussing on Baltimore City, allowing us to control
+for factors specific to the police district. We will be using some of
+the same strategies as other studies (Burke et al., 2018; Srivastava &
+Mullins., 2024; Heilmann et al., 2021) such as controlling for factors
+of precipitation, air quality, and holidays. As well as adding an extra
+factor of our own, greenspace. Our data will be more modern mental
+health crisis call data from 2021-2023 and analyzed daily to account for
+factors such as day of week.
+
+**Bibliography:** 
+
+Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu,
+S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in
+the United States and Mexico. Nature Climate Change, 8(8), 723–729.
+<https://doi.org/10.1038/s41558-018-0222-x> 
+
+Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global
+Climate Change. Climate Change: Vital Signs of the Planet. Retrieved
+October 22, 2024, from
+<https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
+
+Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith,
+G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives
+on heat and health in Baltimore City. Urban Climate, 54, 101841.
+<https://doi.org/10.1016/j.uclim.2024.101841> 
+
+Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and
+heat gradient in high and low poverty areas. Journal of Public
+Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
+
+Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and
+Individual Crises: Evidence from Crisis Text Line. American Journal of
+Health Economics. <https://doi.org/10.1086/730332> 
+
 ## Question 1: What is the frequency of this data frame?
 
 Answer: Daily- day and night
@@ -82,6 +163,22 @@ variable under treatment and no treatment.
 # groupBy policeDistrict
 
 #----------------------------------------------------------------------------------------------
+#df2 <- df2 %>%
+  #mutate(tempCatagories = ifelse(temp_F < 60, 55,
+                          #ifelse(temp_F >= 60 & temp_F < 65, 60,
+                          #ifelse(temp_F >= 65 & temp_F < 70, 65,
+                          #ifelse(temp_F >= 70 & temp_F < 75, 70,
+                          #ifelse(temp_F >= 75 & temp_F < 80, 75,
+                          #ifelse(temp_F >= 80 & temp_F < 85, 80,
+                          #ifelse(temp_F >= 85 & temp_F < 90, 85,
+                          #ifelse(temp_F >= 90 & temp_F < 95, 90,
+                          #ifelse(temp_F >= 95 & temp_F < 100, 95, 
+                          #100))))))))))
+
+#agg_df <- df2 %>%
+  #group_by(policeDistrict, tempCatagories) %>%
+  #summarise(avg_calls = mean(callscount, na.rm = TRUE), totalcalls = sum(callscount))
+
 df2 <- df2 %>%
   mutate(tempCatagories = ifelse(temp_F < 60, 55,
                           ifelse(temp_F >= 60 & temp_F < 65, 60,
@@ -103,6 +200,14 @@ avg_df <- df2 %>%
     the `.groups` argument.
 
 ``` r
+# Step 2: Create the scatter plot
+#ggplot(agg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+  #geom_point(size = 2) + 
+  #geom_smooth(method = "lm", se = FALSE) +
+  #labs(title = "Average Number of Calls vs Temperature (F) by Police District",
+       #x = "Temperature Range (F)", 
+       #y = "Average Number of Calls")
+
 # Step 2: Create the scatter plot
 ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
@@ -302,19 +407,19 @@ summary(model2)
     Coefficients:
                             Estimate Std. Error t value Pr(>|t|)  
     temp_over_100                NaN         NA     NaN      NaN  
-    temp_95_100            0.0059668  0.0228174   0.262   0.7937  
-    temp_90_95            -0.0210142  0.0218748  -0.961   0.3368  
-    temp_85_90             0.0037994  0.0208710   0.182   0.8556  
-    temp_80_85            -0.0542769  0.0551947  -0.983   0.3255  
-    temp_75_80            -0.0125065  0.0224759  -0.556   0.5779  
-    temp_70_75             0.0232719  0.0213465   1.090   0.2757  
-    temp_65_70             0.0007891  0.0198760   0.040   0.9683  
-    temp_60_65                   NaN         NA     NaN      NaN  
-    temp_under_60         -0.0112114  0.0172030  -0.652   0.5146  
+    temp_95_100           -0.0059683  0.0229512  -0.260   0.7948  
+    temp_90_95            -0.0329493  0.0226781  -1.453   0.1463  
+    temp_85_90            -0.0081357  0.0229528  -0.354   0.7230  
+    temp_80_85            -0.0662120  0.0569773  -1.162   0.2452  
+    temp_75_80            -0.0244416  0.0258776  -0.945   0.3449  
+    temp_70_75             0.0113368  0.0254853   0.445   0.6564  
+    temp_65_70            -0.0111460  0.0256284  -0.435   0.6636  
+    temp_60_65            -0.0119351  0.0266014  -0.449   0.6537  
+    temp_under_60         -0.0231465  0.0255194  -0.907   0.3644  
     holiday_bin            0.0146609  0.0143046   1.025   0.3054  
     daytime               -0.0217080  0.0098654  -2.200   0.0278 *
     holiday_bin:daytime   -0.0089105  0.0206048  -0.432   0.6654  
-    temp_over_100:daytime  0.0119351  0.0266014   0.449   0.6537  
+    temp_over_100:daytime        NaN         NA     NaN      NaN  
     temp_95_100:daytime          NaN         NA     NaN      NaN  
     temp_90_95:daytime           NaN         NA     NaN      NaN  
     temp_85_90:daytime           NaN         NA     NaN      NaN  
