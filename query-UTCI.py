@@ -2,7 +2,7 @@ import cdsapi
 
 client = cdsapi.Client()
 dataset = 'derived-utci-historical'
-out = ''
+out = 'tmp'
 request = lambda year, month, day: {
         'variable': 'universal_thermal_climate_indexp',
         'year': year,
@@ -12,4 +12,4 @@ request = lambda year, month, day: {
         'version': '1.0'
         }
 
-client.retrieve(dataset, request, out)
+client.retrieve(dataset, request(2021, 6, 1), out)
