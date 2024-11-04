@@ -163,22 +163,6 @@ variable under treatment and no treatment.
 # groupBy policeDistrict
 
 #----------------------------------------------------------------------------------------------
-#df2 <- df2 %>%
-  #mutate(tempCatagories = ifelse(temp_F < 60, 55,
-                          #ifelse(temp_F >= 60 & temp_F < 65, 60,
-                          #ifelse(temp_F >= 65 & temp_F < 70, 65,
-                          #ifelse(temp_F >= 70 & temp_F < 75, 70,
-                          #ifelse(temp_F >= 75 & temp_F < 80, 75,
-                          #ifelse(temp_F >= 80 & temp_F < 85, 80,
-                          #ifelse(temp_F >= 85 & temp_F < 90, 85,
-                          #ifelse(temp_F >= 90 & temp_F < 95, 90,
-                          #ifelse(temp_F >= 95 & temp_F < 100, 95, 
-                          #100))))))))))
-
-#agg_df <- df2 %>%
-  #group_by(policeDistrict, tempCatagories) %>%
-  #summarise(avg_calls = mean(callscount, na.rm = TRUE), totalcalls = sum(callscount))
-
 df2 <- df2 %>%
   mutate(tempCatagories = ifelse(temp_F < 60, 55,
                           ifelse(temp_F >= 60 & temp_F < 65, 60,
@@ -191,7 +175,13 @@ df2 <- df2 %>%
                           ifelse(temp_F >= 95 & temp_F < 100, 95, 
                           100))))))))))
 
-avg_df <- df2 %>%
+# for winter months
+df2 <- df2 %>%
+  mutate(winter_bin = ifelse(month > 2 & month < 11, 0, 1))
+         
+# for winter
+winter_df <- df2 %>%
+  filter(winter_bin == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 ```
@@ -200,31 +190,185 @@ avg_df <- df2 %>%
     the `.groups` argument.
 
 ``` r
-# Step 2: Create the scatter plot
-#ggplot(agg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
-  #geom_point(size = 2) + 
-  #geom_smooth(method = "lm", se = FALSE) +
-  #labs(title = "Average Number of Calls vs Temperature (F) by Police District",
-       #x = "Temperature Range (F)", 
-       #y = "Average Number of Calls")
+# for non winter
+non_winter_df <- df2 %>%
+  filter(winter_bin == 0) %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarise(avg_calls = mean(callscount, na.rm = TRUE))
+```
 
-# Step 2: Create the scatter plot
-ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+    `summarise()` has grouped output by 'policeDistrict'. You can override using
+    the `.groups` argument.
+
+``` r
+# Scatter plot -winter
+ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District",
+  geom_smooth(se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 ```
 
-    `geom_smooth()` using formula = 'y ~ x'
+    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.925
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.075
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 101.51
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : span too small.  fewer data values than degrees of freedom.
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : pseudoinverse used at 54.9
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : neighborhood radius 10.1
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : reciprocal condition number 0
+
+    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+    : There are other near singularities as well. 102.01
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-1.png)
 
 ``` r
-#-------#
+# Scatter plot -non_winter
+ggplot(non_winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+  geom_point(size = 2) + 
+  geom_smooth(se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Non Winter)",
+       x = "Temperature Range (F)", 
+       y = "Average Number of Calls")
+```
 
-df_summary <- df2 %>%
+    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+![](README_files/figure-commonmark/unnamed-chunk-6-2.png)
+
+``` r
+#----------------------------------------------------------------------------------------------
+
+# for winter
+df_winter <- df2 %>%
+  filter(winter_bin == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
 ```
@@ -233,12 +377,39 @@ df_summary <- df2 %>%
     the `.groups` argument.
 
 ``` r
-ggplot(df_summary, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict)))
+# for non winter
+df_non_winter <- df2 %>%
+  filter(winter_bin == 0) %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarize(total_callscount = sum(callscount))
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-6-2.png)
+    `summarise()` has grouped output by 'policeDistrict'. You can override using
+    the `.groups` argument.
+
+``` r
+# Grouped bar graph -winter
+ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
+    geom_bar(stat="identity") +
+    facet_wrap((~ as.character(policeDistrict))) +
+    labs(title = "Total Number of Calls per Police District (Winter)",
+       x = "Temperature Range (F)", 
+       y = "Total Number of Calls")
+```
+
+![](README_files/figure-commonmark/unnamed-chunk-6-3.png)
+
+``` r
+# Grouped bar graph - non_winter
+ggplot(df_non_winter, aes(x = tempCatagories, y = total_callscount)) + 
+    geom_bar(stat="identity") +
+    facet_wrap((~ as.character(policeDistrict))) +
+    labs(title = "Total Number of Calls per Police District (Non Winter)",
+       x = "Temperature Range (F)", 
+       y = "Total Number of Calls")
+```
+
+![](README_files/figure-commonmark/unnamed-chunk-6-4.png)
 
   
   
@@ -387,6 +558,9 @@ df3 <- df3 %>%
 
 #dayOfTheWeek Holiday Results
 
+
+# split these into 2 for winter non winter months
+
 model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
                policeDistrict + year + month + dow, data=df3)
 
@@ -452,16 +626,16 @@ summary(model3)
 
     Coefficients:
                             Estimate Std. Error t value Pr(>|t|)  
-    temp_over_100                NaN         NA     NaN      NaN  
-    temp_95_100           -0.0072473  0.0228199  -0.318   0.7508  
-    temp_90_95            -0.0338993  0.0223758  -1.515   0.1298  
-    temp_85_90            -0.0079700  0.0221024  -0.361   0.7184  
-    temp_80_85            -0.0643887  0.0566932  -1.136   0.2561  
-    temp_75_80            -0.0243659  0.0255941  -0.952   0.3411  
-    temp_70_75             0.0100497  0.0251673   0.399   0.6897  
-    temp_65_70            -0.0133262  0.0247966  -0.537   0.5910  
-    temp_60_65            -0.0128727  0.0248730  -0.518   0.6048  
-    temp_under_60         -0.0205327  0.0199897  -1.027   0.3044  
+    temp_over_100          0.0072473  0.0228199   0.318   0.7508  
+    temp_95_100                  NaN         NA     NaN      NaN  
+    temp_90_95            -0.0266519  0.0183377  -1.453   0.1462  
+    temp_85_90            -0.0007227  0.0179483  -0.040   0.9679  
+    temp_80_85            -0.0571413  0.0552775  -1.034   0.3013  
+    temp_75_80            -0.0171186  0.0222374  -0.770   0.4414  
+    temp_70_75             0.0172970  0.0217086   0.797   0.4256  
+    temp_65_70            -0.0060789  0.0213149  -0.285   0.7755  
+    temp_60_65            -0.0056254  0.0213336  -0.264   0.7920  
+    temp_under_60         -0.0132854  0.0153528  -0.865   0.3869  
     daytime               -0.0228457  0.0093298  -2.449   0.0144 *
     holiday_bin            0.0122095  0.0140028   0.872   0.3833  
     daytime:holiday_bin   -0.0083655  0.0204815  -0.408   0.6830  
