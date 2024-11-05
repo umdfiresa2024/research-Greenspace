@@ -12,6 +12,8 @@ Step 1. Install necessary packages.
 #| message: false
 install.packages("tidyverse")
 install.packages("kableExtra")
+
+install.packages("terra")
 ```
 
 Step 2. Declare that you will use these packages in this session.
@@ -100,7 +102,12 @@ Step 7: Create a boxplot to visualize the distribution of the outcome variable u
 
 #----------------------------------------------------------------------------------------------
 df2 <- df2 %>%
-  mutate(tempCatagories = ifelse(temp_F < 60, 55,
+  mutate(tempCatagories = ifelse(temp_F < 10, 0,
+                          ifelse(temp_F >= 10 & temp_F < 20, 10,
+                          ifelse(temp_F >= 20 & temp_F < 30, 20,
+                          ifelse(temp_F >= 30 & temp_F < 40, 30,
+                          ifelse(temp_F >= 40 & temp_F < 50, 40,
+                          ifelse(temp_F >= 50 & temp_F < 60, 50,
                           ifelse(temp_F >= 60 & temp_F < 65, 60,
                           ifelse(temp_F >= 65 & temp_F < 70, 65,
                           ifelse(temp_F >= 70 & temp_F < 75, 70,
@@ -109,21 +116,28 @@ df2 <- df2 %>%
                           ifelse(temp_F >= 85 & temp_F < 90, 85,
                           ifelse(temp_F >= 90 & temp_F < 95, 90,
                           ifelse(temp_F >= 95 & temp_F < 100, 95, 
-                          100))))))))))
+                          100)))))))))))))))
 
-# for winter months
+# if 0 -> summer (4 - 9)
+# if 1 -> winter (11 - 2)
+# if 2 -> march and october
 df2 <- df2 %>%
-  mutate(winter_bin = ifelse(month > 2 & month < 11, 0, 1))
+  mutate(seasons = ifelse(month >= 4 & month <= 9, 0,
+                      ifelse(month <= 2 | month >= 11, 1,
+                             2)))
+         
+#df2_summer <- df2 %>%
+         #filter(month>=4 & month<=9)
          
 # for winter
 winter_df <- df2 %>%
-  filter(winter_bin == 1) %>%
+  filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 
-# for non winter
-non_winter_df <- df2 %>%
-  filter(winter_bin == 0) %>%
+# for summer
+summer_df <- df2 %>%
+  filter(seasons == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 
@@ -131,15 +145,15 @@ non_winter_df <- df2 %>%
 ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter)",
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 
-# Scatter plot -non_winter
-ggplot(non_winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+# Scatter plot -summer
+ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Non Winter)",
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 
@@ -151,8 +165,8 @@ df_winter <- df2 %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
 
-# for non winter
-df_non_winter <- df2 %>%
+# for summer
+df_summer <- df2 %>%
   filter(winter_bin == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
@@ -161,15 +175,15 @@ df_non_winter <- df2 %>%
 ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
     geom_bar(stat="identity") +
     facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Winter)",
+    labs(title = "Total Number of Calls per Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Total Number of Calls")
 
-# Grouped bar graph - non_winter
-ggplot(df_non_winter, aes(x = tempCatagories, y = total_callscount)) + 
+# Grouped bar graph -summer
+ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) + 
     geom_bar(stat="identity") +
     facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Non Winter)",
+    labs(title = "Total Number of Calls per Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
        y = "Total Number of Calls")
 ```
@@ -288,6 +302,22 @@ model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
 
 summary(model2)
 summary(model3)
+```
+
+For the Map:
+
+```{r}
+#| echo: true
+
+library("terra")
+
+# baltimore_city<-read.csv("baltimore_zipcodes.csv")
+
+# baltimore <- c("21201", "21202", "21205", "21206", "21207", "21208", "21209", "21210", "21211", "21212", "21213", "21214", "21215", "21216", "21217", "21218", "21222", "21223", "21224", "21225", "21226", "21227", "21228", "21229", "21230", "21231", "21234", "21236", "21237", "21239", "21251", "21287")
+
+# baltimore_city$trt <- 0
+
+# plot(baltimore_city, "trt", col=map.pal("blues"))
 ```
 
 ## Question 10: What are the next steps of your research?
