@@ -37,24 +37,26 @@ df23<-df |>
 
 dfall<-rbind(df21, df22, df23)
 
-df_long<-pivot_longer(dfall, cols=1:2, names_to="daytime", values_to = "temp_K") |>
-  filter(!is.na(temp_K)) |>
-  mutate(daytime=ifelse(daytime=="LST_Day_1km", 1, 0)) |>
-  rename(policeDistrict=Dist_Name)
+df_long<-dfall |>
+  mutate(temp_day_K=ifelse(is.na(LST_Day_1km), LST_Night_1km, LST_Day_1km)) |>
+  mutate(temp_night_K=ifelse(is.na(LST_Night_1km), LST_Day_1km, LST_Night_1km)) |>
+  filter(!is.na(temp_day_K)) |>
+  rename(policeDistrict=Dist_Name) |>
+  group_by(policeDistrict, date) |>
+  summarize(temp_K=(temp_day_K+temp_night_K)/2)
 
 ######aggregate calls by date, day, night##########################################
 
 calls<-read.csv("data/911BehavioralHealthDiversion.csv") |>
   mutate(time=as.numeric(substr(callDateTime, 12, 13))) |>
   mutate(date=as.Date(substr(callDateTime, 1, 10), format="%Y/%m/%d")) |>
-  mutate(daytime=ifelse(time>=6 & time<=18,1,0)) |>
-  group_by(policeDistrict, date, daytime) |>
+  group_by(policeDistrict, date) |>
   tally() |>
   rename(callscount=n)
 
 #########merge data#############################################################
 
-dfm<-merge(df_long, calls, by=c("daytime", "policeDistrict", "date"), all.x=TRUE) |>
+dfm<-merge(df_long, calls, by=c("policeDistrict", "date"), all.x=TRUE) |>
   mutate(callscount=ifelse(is.na(callscount),0, callscount)) |>
   mutate(temp_F=(temp_K-273.15)*1.8+32)
 

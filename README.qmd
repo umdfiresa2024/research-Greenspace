@@ -12,6 +12,8 @@ Step 1. Install necessary packages.
 #| message: false
 install.packages("tidyverse")
 install.packages("kableExtra")
+
+install.packages("terra")
 ```
 
 Step 2. Declare that you will use these packages in this session.
@@ -41,6 +43,30 @@ Step 5. Use the **head** and **kable** function showcase the first 10 rows of th
 ```{r}
 kable(head(df2))
 ```
+
+## Introduction & Literature Review:
+
+Understanding how temperature affects mental health is crucial for society. With rising global temperatures, we will have to be prepared for any impacts that may cause. The years from 2013 to 2023 have been the warmest to date, with 2023 having the highest surface temperature ever recorded (NASA, n.d). High temperatures were studied in Baltimore city through in depth interviews where it was found that at higher heats people were more prone to mental health problems such as depression and anxiety. Especially disadvantaged individuals such as people who are low-income, have disabilities, are homeless, pregnant, elderly people and children (Diallo et al., 2024). If we were to discover more impacts that temperature has on individuals, it could guide urban planners to plan future cities so that they would include public spaces throughout the city. Additionally, by understanding the psychological effects of temperature, governments and healthcare providers can better prepare interventions, such as improving access to mental health services during extreme temperatures. This research could also lead to targeted policies that aim to mitigate the mental health impacts of climate change, ultimately improving societal well-being.
+
+This research project aims to provide the most concentrated area example of the impacts of temperature on mental health. While existing studies have found links between mental health worsening and high temperatures, most have done so for the whole country of the US by county, which makes it more difficult to definitively control for other factors (Burke et al., 2018; Srivastava & Mullins., 2024). The data used by Burke et al. (2018) is based on suicide rates and is from 1968–2004 in the US and 1990-2010 in Mexico by county and analyzed monthly. They found a 0.7% suicide rate increase in the US per 1.8 degrees Fahrenheit increase in monthly temperature. 
+
+Srivastava & Mullins (2024) compared the daily frequencies of crisis line conversations from each county with local average daily temperatures. They found an 8% increase in crisis line conversations on days exceeding 86 degrees Fahrenheit compared to days between 64.4 to 69.8 degrees Fahrenheit. 
+
+Besides existing studies on the link between temperatures and mental health, there are many studies that looked at the impact of temperature on crime rates. Heilmann et al. (2021) discovered that crime rates in Los Angeles police districts increase 1.72% when daily temperature exceeds 75 and 1.90% when daily temperature exceeds 75 and 90 degrees Fahrenheit. 
+
+Our study will differ from existing studies on temperature and mental health on several key points. We will be analyzing a more controlled location and group, focussing on Baltimore City, allowing us to control for factors specific to the police district. We will be using some of the same strategies as other studies (Burke et al., 2018; Srivastava & Mullins., 2024; Heilmann et al., 2021) such as controlling for factors of precipitation, air quality, and holidays. As well as adding an extra factor of our own, greenspace. Our data will be more modern mental health crisis call data from 2021-2023 and analyzed daily to account for factors such as day of week.
+
+**Bibliography:** 
+
+Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu, S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in the United States and Mexico. Nature Climate Change, 8(8), 723–729. <https://doi.org/10.1038/s41558-018-0222-x> 
+
+Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global Climate Change. Climate Change: Vital Signs of the Planet. Retrieved October 22, 2024, from <https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
+
+Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith, G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives on heat and health in Baltimore City. Urban Climate, 54, 101841. <https://doi.org/10.1016/j.uclim.2024.101841> 
+
+Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and heat gradient in high and low poverty areas. Journal of Public Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
+
+Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and Individual Crises: Evidence from Crisis Text Line. American Journal of Health Economics. <https://doi.org/10.1086/730332> 
 
 ## Question 1: What is the frequency of this data frame?
 
@@ -76,7 +102,12 @@ Step 7: Create a boxplot to visualize the distribution of the outcome variable u
 
 #----------------------------------------------------------------------------------------------
 df2 <- df2 %>%
-  mutate(tempCatagories = ifelse(temp_F < 60, 55,
+  mutate(tempCatagories = ifelse(temp_F < 10, 0,
+                          ifelse(temp_F >= 10 & temp_F < 20, 10,
+                          ifelse(temp_F >= 20 & temp_F < 30, 20,
+                          ifelse(temp_F >= 30 & temp_F < 40, 30,
+                          ifelse(temp_F >= 40 & temp_F < 50, 40,
+                          ifelse(temp_F >= 50 & temp_F < 60, 50,
                           ifelse(temp_F >= 60 & temp_F < 65, 60,
                           ifelse(temp_F >= 65 & temp_F < 70, 65,
                           ifelse(temp_F >= 70 & temp_F < 75, 70,
@@ -85,30 +116,76 @@ df2 <- df2 %>%
                           ifelse(temp_F >= 85 & temp_F < 90, 85,
                           ifelse(temp_F >= 90 & temp_F < 95, 90,
                           ifelse(temp_F >= 95 & temp_F < 100, 95, 
-                          100))))))))))
+                          100)))))))))))))))
 
-avg_df <- df2 %>%
+# if 0 -> summer (4 - 9)
+# if 1 -> winter (11 - 2)
+# if 2 -> march and october
+df2 <- df2 %>%
+  mutate(seasons = ifelse(month >= 4 & month <= 9, 0,
+                      ifelse(month <= 2 | month >= 11, 1,
+                             2)))
+         
+#df2_summer <- df2 %>%
+         #filter(month>=4 & month<=9)
+         
+# for winter
+winter_df <- df2 %>%
+  filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 
-# Step 2: Create the scatter plot
-ggplot(avg_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+# for summer
+summer_df <- df2 %>%
+  filter(seasons == 0) %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarise(avg_calls = mean(callscount, na.rm = TRUE))
+
+# Scatter plot -winter
+ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District",
+  geom_smooth(se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 
-#-------#
+# Scatter plot -summer
+ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+  geom_point(size = 2) + 
+  geom_smooth(se = FALSE) +
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Summer 4-9)",
+       x = "Temperature Range (F)", 
+       y = "Average Number of Calls")
 
-df_summary <- df2 %>%
+#----------------------------------------------------------------------------------------------
+
+# for winter
+df_winter <- df2 %>%
+  filter(winter_bin == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
 
-ggplot(df_summary, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict)))
+# for summer
+df_summer <- df2 %>%
+  filter(winter_bin == 0) %>%
+  group_by(policeDistrict, tempCatagories) %>%
+  summarize(total_callscount = sum(callscount))
 
+# Grouped bar graph -winter
+ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
+    geom_bar(stat="identity") +
+    facet_wrap((~ as.character(policeDistrict))) +
+    labs(title = "Total Number of Calls per Police District (Winter 11-2)",
+       x = "Temperature Range (F)", 
+       y = "Total Number of Calls")
+
+# Grouped bar graph -summer
+ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) + 
+    geom_bar(stat="identity") +
+    facet_wrap((~ as.character(policeDistrict))) +
+    labs(title = "Total Number of Calls per Police District (Summer 4-9)",
+       x = "Temperature Range (F)", 
+       y = "Total Number of Calls")
 ```
 
 \
@@ -214,6 +291,9 @@ df3 <- df3 %>%
 
 #dayOfTheWeek Holiday Results
 
+
+# split these into 2 for winter non winter months
+
 model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
                policeDistrict + year + month + dow, data=df3)
 
@@ -222,6 +302,22 @@ model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
 
 summary(model2)
 summary(model3)
+```
+
+For the Map:
+
+```{r}
+#| echo: true
+
+library("terra")
+
+# baltimore_city<-read.csv("baltimore_zipcodes.csv")
+
+# baltimore <- c("21201", "21202", "21205", "21206", "21207", "21208", "21209", "21210", "21211", "21212", "21213", "21214", "21215", "21216", "21217", "21218", "21222", "21223", "21224", "21225", "21226", "21227", "21228", "21229", "21230", "21231", "21234", "21236", "21237", "21239", "21251", "21287")
+
+# baltimore_city$trt <- 0
+
+# plot(baltimore_city, "trt", col=map.pal("blues"))
 ```
 
 ## Question 10: What are the next steps of your research?
