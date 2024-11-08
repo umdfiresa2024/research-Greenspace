@@ -22,9 +22,13 @@ group_name<-c("Jan-Mar 2021 DataSet.zip",
 pd<- vect(police_districts_path)
 crop_utci <- function(utci) {
   pd_proj<-project(pd, crs(utci))
-  utci_pd<-terra::crop(x=utci, y=pd_proj, snap="out", mask=TRUE)
-  df<-terra::extract(utci_pd, pd_proj, fun="mean", na.rm=TRUE)
-  return(df)
+  
+  e<-ext(c(-77, -76, 39.1, 39.4))
+  p <- as.polygons(e, crs="+proj=longlat")
+  
+  d <- terra::crop(x = utci, y=pd_proj, snap="in", mask=TRUE)
+  d_df<-extract(d, pd_proj, "mean", na.rm=TRUE)
+  return(d_df)
 }
 
 df_for_day<-function(fname) {
@@ -60,6 +64,10 @@ df_from_group<-function(group) {
   return(df)
 }
 
-dfs<-sapply(group_name, function(x) df_from_group(paste0(top_path,group_name)))
-utci<-rbind(dfs)
-export.csv(utci, "data\\temp_daily_by_pd.csv", row.names=FALSE)
+utci<-as_tibble(data.frame(DATE=as.Date(character()), PD=integer(), TEMP=double())) # create empty data frame
+for (group in group_name) {
+  path<-paste0(top_path, group)
+  df<-df_from_group(path)
+  utci<-rbind(utci, df)
+}
+write.csv(utci, "data\\temp_daily_by_pd.csv", row.names=FALSE)
