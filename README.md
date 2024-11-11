@@ -1,24 +1,26 @@
 # How does high tempuratures affect mental health in Baltimore City?
 
 
-Step 1. Install necessary packages.
+For installing packages:
 
 ``` r
 install.packages("tidyverse")
 install.packages("kableExtra")
+
+install.packages("terra")
 ```
 
-Step 2. Declare that you will use these packages in this session.
+The packages we will be using:
 
 ``` r
 library("tidyverse")
 library("kableExtra")
+library("terra")
 ```
 
-Step 3. Upload the dataframe that you have created in Spring 2024 into
-the repository.
+Opening the csv file and storing the contents in a dataframe df.
 
-Step 4. Open the dataframe into the RStudio Environment.
+4 additional columns are created for call_bin, date, month. dow.
 
 ``` r
 df<-read.csv("panel.csv")
@@ -29,21 +31,20 @@ df2<-df %>%
   mutate(dow = weekdays(date))
 ```
 
-Step 5. Use the **head** and **kable** function showcase the first 10
-rows of the dataframe to the reader.
+The first 10 rows of the dataframe to the reader.
 
 ``` r
 kable(head(df2))
 ```
 
-| daytime | policeDistrict | date       | actual_date | year | doy |   temp_K | callscount |   temp_F | call_bin | month | dow      |
-|--------:|:---------------|:-----------|------------:|-----:|----:|---------:|-----------:|---------:|---------:|------:|:---------|
-|       0 | Central        | 2021-06-06 |     2021156 | 2021 | 156 | 294.5450 |          0 | 70.51100 |        0 |     6 | Sunday   |
-|       0 | Central        | 2021-06-07 |     2021157 | 2021 | 157 | 296.9489 |          0 | 74.83800 |        0 |     6 | Monday   |
-|       0 | Central        | 2021-06-08 |     2021158 | 2021 | 158 | 298.5400 |          0 | 77.70200 |        0 |     6 | Tuesday  |
-|       0 | Central        | 2021-06-17 |     2021167 | 2021 | 167 | 293.4029 |          0 | 68.45514 |        0 |     6 | Thursday |
-|       0 | Central        | 2021-06-19 |     2021169 | 2021 | 169 | 292.4600 |          0 | 66.75800 |        0 |     6 | Saturday |
-|       0 | Central        | 2021-06-26 |     2021176 | 2021 | 176 | 292.9914 |          0 | 67.71457 |        0 |     6 | Saturday |
+| policeDistrict | date       |   temp_K | callscount |   temp_F | call_bin | month | dow       |
+|:---------------|:-----------|---------:|-----------:|---------:|---------:|------:|:----------|
+| Central        | 2021-06-06 | 302.3536 |          0 | 84.56650 |        0 |     6 | Sunday    |
+| Central        | 2021-06-07 | 306.9233 |          0 | 92.79200 |        0 |     6 | Monday    |
+| Central        | 2021-06-08 | 298.5400 |          0 | 77.70200 |        0 |     6 | Tuesday   |
+| Central        | 2021-06-14 | 308.7900 |          0 | 96.15200 |        0 |     6 | Monday    |
+| Central        | 2021-06-16 | 310.7467 |          0 | 99.67400 |        0 |     6 | Wednesday |
+| Central        | 2021-06-17 | 300.3714 |          0 | 80.99857 |        0 |     6 | Thursday  |
 
 ## Introduction & Literature Review:
 
@@ -126,35 +127,24 @@ Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and
 Individual Crises: Evidence from Crisis Text Line. American Journal of
 Health Economics. <https://doi.org/10.1086/730332> 
 
-## Question 1: What is the frequency of this data frame?
+## Methods:
 
-Answer: Daily- day and night
+The frequency of this data frame is Daily.
 
-## Question 2: What is the cross-sectional (geographical) unit of this data frame?
+The cross-sectional unit of this data frame is the Police district.
 
-Answer: Police district
+The column the treatment variable of interest in temp_F.
 
-Step 6. Use the **names** function to display all the variables (column)
-in the dataframe.
+The column that represnts the outcome variable of interest is call_bin.
 
 ``` r
 names(df2)
 ```
 
-     [1] "daytime"        "policeDistrict" "date"           "actual_date"   
-     [5] "year"           "doy"            "temp_K"         "callscount"    
-     [9] "temp_F"         "call_bin"       "month"          "dow"           
+    [1] "policeDistrict" "date"           "temp_K"         "callscount"    
+    [5] "temp_F"         "call_bin"       "month"          "dow"           
 
-## Question 3: Which column represents the treatment variable of interest?
-
-Answer: temp_F
-
-## Question 4: Which column represents the outcome variable of interest?
-
-Answer: call_bin
-
-Step 7: Create a boxplot to visualize the distribution of the outcome
-variable under treatment and no treatment.
+This displays all of the variables in df2.
 
 ``` r
 # histogram or scatterplots
@@ -164,7 +154,12 @@ variable under treatment and no treatment.
 
 #----------------------------------------------------------------------------------------------
 df2 <- df2 %>%
-  mutate(tempCatagories = ifelse(temp_F < 60, 55,
+  mutate(tempCatagories = ifelse(temp_F < 10, 0,
+                          ifelse(temp_F >= 10 & temp_F < 20, 10,
+                          ifelse(temp_F >= 20 & temp_F < 30, 20,
+                          ifelse(temp_F >= 30 & temp_F < 40, 30,
+                          ifelse(temp_F >= 40 & temp_F < 50, 40,
+                          ifelse(temp_F >= 50 & temp_F < 60, 50,
                           ifelse(temp_F >= 60 & temp_F < 65, 60,
                           ifelse(temp_F >= 65 & temp_F < 70, 65,
                           ifelse(temp_F >= 70 & temp_F < 75, 70,
@@ -173,15 +168,22 @@ df2 <- df2 %>%
                           ifelse(temp_F >= 85 & temp_F < 90, 85,
                           ifelse(temp_F >= 90 & temp_F < 95, 90,
                           ifelse(temp_F >= 95 & temp_F < 100, 95, 
-                          100))))))))))
+                          100)))))))))))))))
 
-# for winter months
+# if 0 -> summer (4 - 9)
+# if 1 -> winter (11 - 2)
+# if 2 -> march and october
 df2 <- df2 %>%
-  mutate(winter_bin = ifelse(month > 2 & month < 11, 0, 1))
+  mutate(seasons = ifelse(month >= 4 & month <= 9, 0,
+                      ifelse(month <= 2 | month >= 11, 1,
+                             2)))
+         
+#df2_summer <- df2 %>%
+         #filter(month>=4 & month<=9)
          
 # for winter
 winter_df <- df2 %>%
-  filter(winter_bin == 1) %>%
+  filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 ```
@@ -190,9 +192,9 @@ winter_df <- df2 %>%
     the `.groups` argument.
 
 ``` r
-# for non winter
-non_winter_df <- df2 %>%
-  filter(winter_bin == 0) %>%
+# for summer
+summer_df <- df2 %>%
+  filter(seasons == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
 ```
@@ -205,156 +207,21 @@ non_winter_df <- df2 %>%
 ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter)",
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 ```
 
     `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.925
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.075
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 101.51
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : span too small.  fewer data values than degrees of freedom.
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : pseudoinverse used at 54.9
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : neighborhood radius 10.1
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : reciprocal condition number 0
-
-    Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
-    : There are other near singularities as well. 102.01
-
 ![](README_files/figure-commonmark/unnamed-chunk-6-1.png)
 
 ``` r
-# Scatter plot -non_winter
-ggplot(non_winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
+# Scatter plot -summer
+ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
-  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Non Winter)",
+  labs(title = "Average Number of Calls vs Temperature (F) by Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
 ```
@@ -365,10 +232,12 @@ ggplot(non_winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistr
 
 ``` r
 #----------------------------------------------------------------------------------------------
+# We will not be using these graphs
+
 
 # for winter
 df_winter <- df2 %>%
-  filter(winter_bin == 1) %>%
+  filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
 ```
@@ -377,9 +246,9 @@ df_winter <- df2 %>%
     the `.groups` argument.
 
 ``` r
-# for non winter
-df_non_winter <- df2 %>%
-  filter(winter_bin == 0) %>%
+# for summer
+df_summer <- df2 %>%
+  filter(seasons == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
 ```
@@ -392,7 +261,7 @@ df_non_winter <- df2 %>%
 ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
     geom_bar(stat="identity") +
     facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Winter)",
+    labs(title = "Total Number of Calls per Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Total Number of Calls")
 ```
@@ -400,25 +269,26 @@ ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) +
 ![](README_files/figure-commonmark/unnamed-chunk-6-3.png)
 
 ``` r
-# Grouped bar graph - non_winter
-ggplot(df_non_winter, aes(x = tempCatagories, y = total_callscount)) + 
+# Grouped bar graph -summer
+ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) + 
     geom_bar(stat="identity") +
     facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Non Winter)",
+    labs(title = "Total Number of Calls per Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
        y = "Total Number of Calls")
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-4.png)
 
-  
+Shows 2 scatter plots split by winter and summer. Compares the average
+number of calls received with the temperature by police district.  
   
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
 
-Step 8: Fit a regression model $y=\beta_0 + \beta_1 x + \epsilon$ where
-$y$ is the outcome variable and $x$ is the treatment variable. Use the
-**summary** function to display the results.
+The following shows our regression model
+$y=\beta_0 + \beta_1 x + \epsilon$ where $y$ is the outcome variable and
+$x$ is the treatment variable.
 
 ``` r
 model1<-lm(call_bin ~ temp_F, data=df2)
@@ -431,23 +301,21 @@ summary(model1)
     lm(formula = call_bin ~ temp_F, data = df2)
 
     Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.09024 -0.08269 -0.07875 -0.07461  0.92955 
+        Min      1Q  Median      3Q     Max 
+    -0.1706 -0.1611 -0.1548 -0.1489  0.8579 
 
     Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-    (Intercept)  0.0917032  0.0086954  10.546   <2e-16 ***
-    temp_F      -0.0001999  0.0001329  -1.505    0.132    
+                 Estimate Std. Error t value Pr(>|t|)    
+    (Intercept) 0.1389938  0.0148053   9.388   <2e-16 ***
+    temp_F      0.0002887  0.0002267   1.274    0.203    
     ---
     Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-    Residual standard error: 0.2703 on 8450 degrees of freedom
-    Multiple R-squared:  0.0002679, Adjusted R-squared:  0.0001496 
-    F-statistic: 2.264 on 1 and 8450 DF,  p-value: 0.1324
+    Residual standard error: 0.3637 on 5762 degrees of freedom
+    Multiple R-squared:  0.0002814, Adjusted R-squared:  0.0001079 
+    F-statistic: 1.622 on 1 and 5762 DF,  p-value: 0.2029
 
-## Question 7: What is the equation that describes the linear regression above? Please include an explanation of the variables and subscripts.
-
-Answer:
+Our linear regression equation.
 
 $$
 callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \gamma_p + \eta_d + \theta_{dayofweek} + \omega_{month} + \pi_year+\epsilon_{pdt}
@@ -474,9 +342,7 @@ Data Description:
 - Untreated Group:# of call on a cool weekday in a specific month in a
   police district
 
-## Question 8: What fixed effects can be included in the regression? What does each fixed effects control for? Please include a new equation that incorporates the fixed effects.
-
-Answer:
+Fixed effects:
 
 Police district: controls for better or worse conditions in the city
 
@@ -494,32 +360,14 @@ Answer:
 #install.packages("lfe")
 library("lfe")
 
-model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
-               policeDistrict + year + month + dow, data=df2)
+#model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
+               #policeDistrict + year + month + dow, data=df2)
 
-summary(model2)
+#model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
+               #policeDistrict + year + month + dow, data=df2)
+
+#summary(model2)
 ```
-
-
-    Call:
-       felm(formula = call_bin ~ temp_F + daytime + temp_F:daytime |      policeDistrict + year + month + dow, data = df2) 
-
-    Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.17312 -0.09836 -0.07288 -0.04830  0.98544 
-
-    Coefficients:
-                     Estimate Std. Error t value Pr(>|t|)
-    temp_F          1.930e-04  4.406e-04   0.438    0.661
-    daytime        -2.704e-02  2.037e-02  -1.327    0.184
-    temp_F:daytime -3.456e-05  3.188e-04  -0.108    0.914
-
-    Residual standard error: 0.2689 on 8421 degrees of freedom
-    Multiple R-squared(full model): 0.0145   Adjusted R-squared: 0.01099 
-    Multiple R-squared(proj model): 0.002268   Adjusted R-squared: -0.001287 
-    F-statistic(full model): 4.13 on 30 and 8421 DF, p-value: 2.94e-13 
-    F-statistic(proj model):  6.38 on 3 and 8421 DF, p-value: 0.0002584 
-    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
 
 ``` r
 # for the temperature range
@@ -561,104 +409,29 @@ df3 <- df3 %>%
 
 # split these into 2 for winter non winter months
 
-model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               policeDistrict + year + month + dow, data=df3)
+#model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               #policeDistrict + year + month + dow, data=df3)
 
-model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + daytime + holiday_bin + holiday_bin:daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               policeDistrict + year + dow, data=df3)
+#model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + daytime + holiday_bin + holiday_bin:daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
+               #policeDistrict + year + dow, data=df3)
 
-summary(model2)
+#summary(model2)
+#summary(model3)
 ```
 
-
-    Call:
-       felm(formula = call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 +      temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 +      temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime +      daytime + temp_over_100:daytime + temp_95_100:daytime + temp_90_95:daytime +      temp_85_90:daytime + temp_80_85:daytime + temp_75_80:daytime +      temp_70_75:daytime + temp_65_70:daytime + temp_60_65:daytime +      temp_under_60 | policeDistrict + year + month + dow, data = df3) 
-
-    Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.19410 -0.09857 -0.07214 -0.04635  1.00512 
-
-    Coefficients:
-                            Estimate Std. Error t value Pr(>|t|)  
-    temp_over_100                NaN         NA     NaN      NaN  
-    temp_95_100           -0.0059683  0.0229512  -0.260   0.7948  
-    temp_90_95            -0.0329493  0.0226781  -1.453   0.1463  
-    temp_85_90            -0.0081357  0.0229528  -0.354   0.7230  
-    temp_80_85            -0.0662120  0.0569773  -1.162   0.2452  
-    temp_75_80            -0.0244416  0.0258776  -0.945   0.3449  
-    temp_70_75             0.0113368  0.0254853   0.445   0.6564  
-    temp_65_70            -0.0111460  0.0256284  -0.435   0.6636  
-    temp_60_65            -0.0119351  0.0266014  -0.449   0.6537  
-    temp_under_60         -0.0231465  0.0255194  -0.907   0.3644  
-    holiday_bin            0.0146609  0.0143046   1.025   0.3054  
-    daytime               -0.0217080  0.0098654  -2.200   0.0278 *
-    holiday_bin:daytime   -0.0089105  0.0206048  -0.432   0.6654  
-    temp_over_100:daytime        NaN         NA     NaN      NaN  
-    temp_95_100:daytime          NaN         NA     NaN      NaN  
-    temp_90_95:daytime           NaN         NA     NaN      NaN  
-    temp_85_90:daytime           NaN         NA     NaN      NaN  
-    temp_80_85:daytime     0.0238370  0.0558956   0.426   0.6698  
-    temp_75_80:daytime    -0.0008528  0.0269323  -0.032   0.9747  
-    temp_70_75:daytime    -0.0072356  0.0275893  -0.262   0.7931  
-    temp_65_70:daytime    -0.0166072  0.0256621  -0.647   0.5176  
-    temp_60_65:daytime    -0.0205137  0.0280212  -0.732   0.4641  
-    ---
-    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-    Residual standard error: 0.2689 on 8407 degrees of freedom
-    Multiple R-squared(full model): 0.01628   Adjusted R-squared: 0.01113 
-    Multiple R-squared(proj model): 0.004068   Adjusted R-squared: -0.001145 
-    F-statistic(full model):3.162 on 44 and 8407 DF, p-value: 1.108e-11 
-    F-statistic(proj model): 1.561 on 22 and 8407 DF, p-value: 0.04568 
-    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+For the Map:
 
 ``` r
-summary(model3)
+library("terra")
+
+# baltimore_city<-read.csv("baltimore_zipcodes.csv")
+
+# baltimore <- c("21201", "21202", "21205", "21206", "21207", "21208", "21209", "21210", "21211", "21212", "21213", "21214", "21215", "21216", "21217", "21218", "21222", "21223", "21224", "21225", "21226", "21227", "21228", "21229", "21230", "21231", "21234", "21236", "21237", "21239", "21251", "21287")
+
+# baltimore_city$trt <- 0
+
+# plot(baltimore_city, "trt", col=map.pal("blues"))
 ```
-
-
-    Call:
-       felm(formula = call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 +      temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 +      temp_60_65 + temp_under_60 + daytime + holiday_bin + holiday_bin:daytime +      temp_over_100:daytime + temp_95_100:daytime + temp_90_95:daytime +      temp_85_90:daytime + temp_80_85:daytime + temp_75_80:daytime +      temp_70_75:daytime + temp_65_70:daytime + temp_60_65:daytime +      temp_under_60 | policeDistrict + year + dow, data = df3) 
-
-    Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.18716 -0.09822 -0.07301 -0.04770  1.00634 
-
-    Coefficients:
-                            Estimate Std. Error t value Pr(>|t|)  
-    temp_over_100          0.0072473  0.0228199   0.318   0.7508  
-    temp_95_100                  NaN         NA     NaN      NaN  
-    temp_90_95            -0.0266519  0.0183377  -1.453   0.1462  
-    temp_85_90            -0.0007227  0.0179483  -0.040   0.9679  
-    temp_80_85            -0.0571413  0.0552775  -1.034   0.3013  
-    temp_75_80            -0.0171186  0.0222374  -0.770   0.4414  
-    temp_70_75             0.0172970  0.0217086   0.797   0.4256  
-    temp_65_70            -0.0060789  0.0213149  -0.285   0.7755  
-    temp_60_65            -0.0056254  0.0213336  -0.264   0.7920  
-    temp_under_60         -0.0132854  0.0153528  -0.865   0.3869  
-    daytime               -0.0228457  0.0093298  -2.449   0.0144 *
-    holiday_bin            0.0122095  0.0140028   0.872   0.3833  
-    daytime:holiday_bin   -0.0083655  0.0204815  -0.408   0.6830  
-    temp_over_100:daytime        NaN         NA     NaN      NaN  
-    temp_95_100:daytime          NaN         NA     NaN      NaN  
-    temp_90_95:daytime           NaN         NA     NaN      NaN  
-    temp_85_90:daytime           NaN         NA     NaN      NaN  
-    temp_80_85:daytime     0.0237024  0.0553083   0.429   0.6683  
-    temp_75_80:daytime     0.0022584  0.0242758   0.093   0.9259  
-    temp_70_75:daytime    -0.0006016  0.0248375  -0.024   0.9807  
-    temp_65_70:daytime    -0.0092256  0.0235930  -0.391   0.6958  
-    temp_60_65:daytime    -0.0116907  0.0268645  -0.435   0.6634  
-    ---
-    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-    Residual standard error: 0.2688 on 8418 degrees of freedom
-    Multiple R-squared(full model): 0.01551   Adjusted R-squared: 0.01165 
-    Multiple R-squared(proj model): 0.004044   Adjusted R-squared: 0.0001396 
-    F-statistic(full model):4.019 on 33 and 8418 DF, p-value: 9.26e-14 
-    F-statistic(proj model): 1.554 on 22 and 8418 DF, p-value: 0.04741 
-    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
-
-## Question 10: What are the next steps of your research?
 
 Future Plans:
 
