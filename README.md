@@ -1,7 +1,7 @@
 # How does high tempuratures affect mental health in Baltimore City?
 
 
-For installing packages:
+This code segment is for installing packages:
 
 ``` r
 install.packages("tidyverse")
@@ -10,7 +10,7 @@ install.packages("kableExtra")
 install.packages("terra")
 ```
 
-The packages we will be using:
+These are the packages we will be using:
 
 ``` r
 library("tidyverse")
@@ -18,9 +18,9 @@ library("kableExtra")
 library("terra")
 ```
 
-Opening the csv file and storing the contents in a dataframe df.
-
-4 additional columns are created for call_bin, date, month. dow.
+This code segment is for opening the csv file and storing the contents
+in a dataframe df. 4 additional columns are created for call_bin, date,
+month. dow.
 
 ``` r
 df<-read.csv("panel.csv")
@@ -32,7 +32,7 @@ df2<-df %>%
   mutate(dow = weekdays(date))
 ```
 
-The first 10 rows of the dataframe to the reader.
+The table below shows the first ten observations of our data frame.
 
 ``` r
 kable(head(df2))
@@ -136,7 +136,9 @@ The cross-sectional unit of this data frame is the Police district.
 
 The column the treatment variable of interest in temp_F.
 
-The column that represnts the outcome variable of interest is call_bin.
+The column that represents the outcome variable of interest is call_bin.
+
+This code block displays all of the variables in df2.
 
 ``` r
 names(df2)
@@ -146,7 +148,13 @@ names(df2)
     [5] "temp_F"         "call_bin"       "year"           "month"         
     [9] "dow"           
 
-This displays all of the variables in df2.
+Shows 2 scatter plots split by winter and summer. Compares the average
+number of calls received with the temperature by police district.
+
+First scatter plot represents the relationship between the temperature
+and the amount of calls received based on the police districts during
+winter. Second scatter plot represents the same relationship but for the
+summer.
 
 ``` r
 # histogram or scatterplots
@@ -203,9 +211,12 @@ summer_df <- df2 %>%
 
 ``` r
 # Scatter plot -winter
+greenPalette <- c("#003300", "#004d00", "#006600", "#008000", "#009900", "#00b300", "#00cc00", "#33cc33", "#66ff66")
+
 ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
+  scale_color_manual(values = greenPalette) +
   labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
@@ -220,6 +231,8 @@ ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)
 ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)) + 
   geom_point(size = 2) + 
   geom_smooth(se = FALSE) +
+  scale_color_manual(values = greenPalette) +
+  #scale_color_manual(values = c("#006400", "#228B22", "#32CD32", "#7FFF00", "#ADFF2F")) +
   labs(title = "Average Number of Calls vs Temperature (F) by Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
        y = "Average Number of Calls")
@@ -279,8 +292,7 @@ ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) +
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-4.png)
 
-Shows 2 scatter plots split by winter and summer. Compares the average
-number of calls received with the temperature by police district.  
+  
   
 
 ![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
@@ -343,20 +355,24 @@ Data Description:
 
 Fixed effects:
 
-Police district: controls for better or worse conditions in the city
+- Police district: controls for better or worse conditions in the city
 
-DOW: controls any differences that might have occurred one day to
-another
+- DOW: controls any differences that might have occurred one day to
+  another
 
-Month: controls any differences that might have occurred one month to
-another
+- Month: controls any differences that might have occurred one month to
+  another
 
-Year: controls any differences that might have occurred one year to
-another
+- Year: controls any differences that might have occurred one year to
+  another
 
-## Question 9: What is the impact of the treatment effect once fixed effects are included?
+## 
 
-Answer:
+The following code segments create new column holiday_bin is created
+which represents whether there was a school holiday or or not.
+Additionally, they create 4 regression models which help us understand
+the effect temperature and holidays play on mental health calls. We
+split these models for the winter and summer.
 
 ``` r
 #install.packages("lfe")
@@ -399,7 +415,6 @@ df3<-df2 %>%
   mutate(temp_70_75=ifelse(temp_F> 70 & temp_F<=75, 1, 0)) %>%
   mutate(temp_65_70=ifelse(temp_F> 65 & temp_F<=70, 1, 0)) %>%
   mutate(temp_60_65=ifelse(temp_F> 60 & temp_F<=65, 1, 0)) %>%
-  
   mutate(temp_55_60=ifelse(temp_F> 55 & temp_F<=60, 1, 0)) %>%
   mutate(temp_50_55=ifelse(temp_F> 50 & temp_F<=55, 1, 0)) %>%
   mutate(temp_45_50=ifelse(temp_F> 45 & temp_F<=50, 1, 0)) %>%
@@ -407,7 +422,6 @@ df3<-df2 %>%
   mutate(temp_35_40=ifelse(temp_F> 35 & temp_F<=40, 1, 0)) %>%
   mutate(temp_30_35=ifelse(temp_F> 30 & temp_F<=35, 1, 0)) %>%
   mutate(temp_25_30=ifelse(temp_F> 25 & temp_F<=30, 1, 0)) %>%
-  
   mutate(temp_20_25=ifelse(temp_F> 20 & temp_F<=25, 1, 0)) %>%
   mutate(temp_15_20=ifelse(temp_F> 15 & temp_F<=20, 1, 0)) %>%
   mutate(temp_10_15=ifelse(temp_F> 10 & temp_F<=15, 1, 0)) %>%
@@ -485,30 +499,32 @@ summary(model2)
     -0.43581 -0.16850 -0.11614 -0.05802  1.01332 
 
     Coefficients:
-                   Estimate Std. Error t value Pr(>|t|)
-    temp_over_100       NaN         NA     NaN      NaN
-    temp_95_100         NaN         NA     NaN      NaN
-    temp_90_95          NaN         NA     NaN      NaN
-    temp_85_90          NaN         NA     NaN      NaN
-    temp_80_85          NaN         NA     NaN      NaN
-    temp_75_80    0.4871404  0.3464731   1.406    0.160
-    temp_70_75    0.2081637  0.2536312   0.821    0.412
-    temp_65_70    0.0070556  0.2636326   0.027    0.979
-    temp_60_65    0.1415237  0.2521563   0.561    0.575
-    temp_55_60    0.1688138  0.2477403   0.681    0.496
-    temp_50_55    0.2027984  0.2466866   0.822    0.411
-    temp_45_50    0.1674739  0.2461849   0.680    0.496
-    temp_40_45    0.1986085  0.2459097   0.808    0.419
-    temp_35_40    0.1828429  0.2457628   0.744    0.457
-    temp_30_35    0.1895035  0.2456725   0.771    0.441
-    temp_25_30    0.1825487  0.2461445   0.742    0.458
-    temp_20_25    0.0672610  0.2505244   0.268    0.788
-    temp_15_20    0.1051526  0.2536099   0.415    0.678
-    temp_10_15    0.3663631  0.2606882   1.405    0.160
-    temp_5_10           NaN         NA     NaN      NaN
-    temp_0_5            NaN         NA     NaN      NaN
-    temp_under_0        NaN         NA     NaN      NaN
-    holiday_bin   0.0006408  0.0228495   0.028    0.978
+                    Estimate Std. Error t value Pr(>|t|)  
+    temp_over_100        NaN         NA     NaN      NaN  
+    temp_95_100          NaN         NA     NaN      NaN  
+    temp_90_95           NaN         NA     NaN      NaN  
+    temp_85_90           NaN         NA     NaN      NaN  
+    temp_80_85           NaN         NA     NaN      NaN  
+    temp_75_80           NaN         NA     NaN      NaN  
+    temp_70_75    -0.2789767  0.2530253  -1.103   0.2704  
+    temp_65_70    -0.4800848  0.2631810  -1.824   0.0683 .
+    temp_60_65    -0.3456167  0.2520320  -1.371   0.1704  
+    temp_55_60    -0.3183266  0.2480381  -1.283   0.1995  
+    temp_50_55    -0.2843420  0.2471783  -1.150   0.2501  
+    temp_45_50    -0.3196665  0.2464080  -1.297   0.1947  
+    temp_40_45    -0.2885319  0.2463205  -1.171   0.2416  
+    temp_35_40    -0.3042975  0.2463253  -1.235   0.2169  
+    temp_30_35    -0.2976369  0.2466040  -1.207   0.2276  
+    temp_25_30    -0.3045917  0.2470367  -1.233   0.2177  
+    temp_20_25    -0.4198794  0.2513296  -1.671   0.0950 .
+    temp_15_20    -0.3819878  0.2549112  -1.499   0.1342  
+    temp_10_15    -0.1207773  0.2616363  -0.462   0.6444  
+    temp_5_10     -0.4871404  0.3464731  -1.406   0.1599  
+    temp_0_5             NaN         NA     NaN      NaN  
+    temp_under_0         NaN         NA     NaN      NaN  
+    holiday_bin    0.0006408  0.0228495   0.028   0.9776  
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
     Residual standard error: 0.3449 on 1928 degrees of freedom
     Multiple R-squared(full model): 0.04744   Adjusted R-squared: 0.03015 
@@ -1410,7 +1426,7 @@ summary(model5)
     F-statistic(proj model): 0.965 on 190 and 2713 DF, p-value: 0.6191 
     *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
 
-For the Map:
+The Map: (not done yet)
 
 ``` r
 library("terra")
@@ -1421,7 +1437,7 @@ police_districts<-vect("/Users/roshan/Downloads/UMD/Fall-2024/FIRE298/research-G
 
 police_districts$trt <- 0
 
-plot(police_districts, "trt", col=map.pal("blues"))
+plot(police_districts, "trt", col=map.pal("greens"))
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-10-1.png)
@@ -1444,18 +1460,3 @@ Future Plans:
   - trees
 
   - air quality
-
-Step 9: Change the document format to gfm
-
-Step 10: Save this document as README.qmd
-
-Step 11: Render the document. README.md file should be created after
-this process.
-
-Step 12: Push the document back to GitHub and observe your beautiful
-document in your repository!
-
-Step 13: If your team has a complete dataframe that includes both the
-treated and outcome variable, you are done with the assignment. If not,
-make a research plan in Notion to collect data on the outcome and
-treatment variable and combine it into one dataframe.
