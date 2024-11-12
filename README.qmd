@@ -35,6 +35,7 @@ df<-read.csv("panel.csv")
 df2<-df %>%
   mutate(call_bin = ifelse(callscount>0, 1, 0)) %>%
   mutate(date = as.Date(date)) %>%
+  mutate(year = year(date)) %>%
   mutate(month = month(date)) %>%
   mutate(dow = weekdays(date))
 ```
@@ -119,9 +120,6 @@ df2 <- df2 %>%
                       ifelse(month <= 2 | month >= 11, 1,
                              2)))
          
-#df2_summer <- df2 %>%
-         #filter(month>=4 & month<=9)
-         
 # for winter
 winter_df <- df2 %>%
   filter(seasons == 1) %>%
@@ -199,7 +197,7 @@ summary(model1)
 Our linear regression equation.
 
 $$
-callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \gamma_p + \eta_d + \theta_{dayofweek} + \omega_{month} + \pi_year+\epsilon_{pdt}
+callscount_{pdt} = \beta_0 + \beta_1 temp_{pdt} + \gamma_p + \eta_d + \theta_{dayofweek} + \omega_{month} + \pi_{year}+\epsilon_{pdt}
 $$
 
 Where $callscount$ represents the outcome variable that shows whether there a call from police district \$p\$, on day \$d\$, at time of day \$t\$.
@@ -222,7 +220,9 @@ Fixed effects:
 
 Police district: controls for better or worse conditions in the city
 
-Daytime: controls the differences that might occur based on the time of day
+DOW: controls any differences that might have occurred one day to another
+
+Month: controls any differences that might have occurred one month to another
 
 Year: controls any differences that might have occurred one year to another
 
@@ -236,13 +236,10 @@ Answer:
 #install.packages("lfe")
 library("lfe")
 
-#model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
-               #policeDistrict + year + month + dow, data=df2)
+model2<-felm(call_bin ~ temp_F + temp_F| 
+               policeDistrict + year + month + dow, data=df2)
 
-#model2<-felm(call_bin ~ temp_F + daytime + temp_F:daytime| 
-               #policeDistrict + year + month + dow, data=df2)
-
-#summary(model2)
+summary(model2)
 ```
 
 ```{r}
@@ -260,7 +257,21 @@ df3<-df2 %>%
   mutate(temp_70_75=ifelse(temp_F> 70 & temp_F<=75, 1, 0)) %>%
   mutate(temp_65_70=ifelse(temp_F> 65 & temp_F<=70, 1, 0)) %>%
   mutate(temp_60_65=ifelse(temp_F> 60 & temp_F<=65, 1, 0)) %>%
-  mutate(temp_under_60=ifelse(temp_F<= 60, 1, 0))
+  
+  mutate(temp_55_60=ifelse(temp_F> 55 & temp_F<=60, 1, 0)) %>%
+  mutate(temp_50_55=ifelse(temp_F> 50 & temp_F<=55, 1, 0)) %>%
+  mutate(temp_45_50=ifelse(temp_F> 45 & temp_F<=50, 1, 0)) %>%
+  mutate(temp_40_45=ifelse(temp_F> 40 & temp_F<=45, 1, 0)) %>%
+  mutate(temp_35_40=ifelse(temp_F> 35 & temp_F<=40, 1, 0)) %>%
+  mutate(temp_30_35=ifelse(temp_F> 30 & temp_F<=35, 1, 0)) %>%
+  mutate(temp_25_30=ifelse(temp_F> 25 & temp_F<=30, 1, 0)) %>%
+  
+  mutate(temp_20_25=ifelse(temp_F> 20 & temp_F<=25, 1, 0)) %>%
+  mutate(temp_15_20=ifelse(temp_F> 15 & temp_F<=20, 1, 0)) %>%
+  mutate(temp_10_15=ifelse(temp_F> 10 & temp_F<=15, 1, 0)) %>%
+  mutate(temp_5_10=ifelse(temp_F> 5 & temp_F<=10, 1, 0)) %>%
+  mutate(temp_0_5=ifelse(temp_F> 0 & temp_F<=5, 1, 0)) %>%
+  mutate(temp_under_0=ifelse(temp_F<= 0, 1, 0))
 
 #-------#
 
@@ -282,20 +293,85 @@ df3 <- df3 %>%
   mutate(holiday_bin = ifelse(date %in% holidays, 1, 0))
 
 #-------#
-
-#dayOfTheWeek Holiday Results
-
-
 # split these into 2 for winter non winter months
 
-#model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + holiday_bin + holiday_bin:daytime + daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               #policeDistrict + year + month + dow, data=df3)
 
-#model3<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 + temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_under_60 + daytime + holiday_bin + holiday_bin:daytime + temp_over_100:daytime + temp_95_100: daytime + temp_90_95: daytime + temp_85_90: daytime + temp_80_85: daytime + temp_75_80: daytime + temp_70_75: daytime + temp_65_70: daytime + temp_60_65: daytime + temp_under_60| 
-               #policeDistrict + year + dow, data=df3)
+# This is for the winter months
 
-#summary(model2)
-#summary(model3)
+# We should focus on the tempurature range 45- 50 as it the most significant
+df4w<-df3 %>%
+  filter(seasons == 1)
+
+model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 +
+               temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_55_60 + temp_50_55 +                  temp_45_50 + temp_40_45 + temp_35_40 + temp_30_35 + temp_25_30 + temp_20_25 +                  temp_15_20 + temp_10_15 + temp_5_10 + temp_0_5 + temp_under_0  +
+               holiday_bin |
+               policeDistrict + year + month + dow, data=df4w)
+
+
+model3<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
+               temp_95_100:as.factor(policeDistrict) + 
+               temp_90_95:as.factor(policeDistrict) + 
+               temp_85_90:as.factor(policeDistrict) + 
+               temp_80_85:as.factor(policeDistrict) +
+               temp_75_80:as.factor(policeDistrict) + 
+               temp_70_75:as.factor(policeDistrict) + 
+               temp_65_70:as.factor(policeDistrict) + 
+               temp_60_65:as.factor(policeDistrict) + 
+               temp_50_55:as.factor(policeDistrict) + 
+               temp_45_50:as.factor(policeDistrict) + 
+               temp_40_45:as.factor(policeDistrict) + 
+               temp_35_40:as.factor(policeDistrict) + 
+               temp_30_35:as.factor(policeDistrict) + 
+               temp_25_30:as.factor(policeDistrict) + 
+               temp_20_25:as.factor(policeDistrict) + 
+               temp_15_20:as.factor(policeDistrict) + 
+               temp_10_15:as.factor(policeDistrict) + 
+               temp_5_10:as.factor(policeDistrict) + 
+               temp_0_5:as.factor(policeDistrict) + 
+               temp_under_0:as.factor(policeDistrict) + 
+               holiday_bin | year + month + dow, data=df4w)
+
+summary(model2)
+summary(model3)
+
+#-------#
+
+
+# This is for the summer months
+df4s<-df3 %>%
+  filter(seasons == 0)
+
+model4<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + temp_80_85 +
+               temp_75_80 + temp_70_75 + temp_65_70 + temp_60_65 + temp_55_60 + temp_50_55 +                  temp_45_50 + temp_40_45 + temp_35_40 + temp_30_35 + temp_25_30 + temp_20_25 +                  temp_15_20 + temp_10_15 + temp_5_10 + temp_0_5 + temp_under_0  +
+               holiday_bin |
+               policeDistrict + year + month + dow, data=df4s)
+
+
+model5<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
+               temp_95_100:as.factor(policeDistrict) + 
+               temp_90_95:as.factor(policeDistrict) + 
+               temp_85_90:as.factor(policeDistrict) + 
+               temp_80_85:as.factor(policeDistrict) +
+               temp_75_80:as.factor(policeDistrict) + 
+               temp_70_75:as.factor(policeDistrict) + 
+               temp_65_70:as.factor(policeDistrict) + 
+               temp_60_65:as.factor(policeDistrict) + 
+               temp_50_55:as.factor(policeDistrict) + 
+               temp_45_50:as.factor(policeDistrict) + 
+               temp_40_45:as.factor(policeDistrict) + 
+               temp_35_40:as.factor(policeDistrict) + 
+               temp_30_35:as.factor(policeDistrict) + 
+               temp_25_30:as.factor(policeDistrict) + 
+               temp_20_25:as.factor(policeDistrict) + 
+               temp_15_20:as.factor(policeDistrict) + 
+               temp_10_15:as.factor(policeDistrict) + 
+               temp_5_10:as.factor(policeDistrict) + 
+               temp_0_5:as.factor(policeDistrict) + 
+               temp_under_0:as.factor(policeDistrict) + 
+               holiday_bin | year + month + dow, data=df4s)
+
+summary(model4)
+summary(model5)
 ```
 
 For the Map:
@@ -305,13 +381,13 @@ For the Map:
 
 library("terra")
 
-# baltimore_city<-read.csv("baltimore_zipcodes.csv")
+police_districts<-vect("/Users/roshan/Downloads/UMD/Fall-2024/FIRE298/research-Greenspace/Police_Districts_2023/Police_Districts_2023.shp")
 
 # baltimore <- c("21201", "21202", "21205", "21206", "21207", "21208", "21209", "21210", "21211", "21212", "21213", "21214", "21215", "21216", "21217", "21218", "21222", "21223", "21224", "21225", "21226", "21227", "21228", "21229", "21230", "21231", "21234", "21236", "21237", "21239", "21251", "21287")
 
-# baltimore_city$trt <- 0
+police_districts$trt <- 0
 
-# plot(baltimore_city, "trt", col=map.pal("blues"))
+plot(police_districts, "trt", col=map.pal("blues"))
 ```
 
 Future Plans:
