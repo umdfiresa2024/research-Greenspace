@@ -193,23 +193,13 @@ winter_df <- df2 %>%
   filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
-```
 
-    `summarise()` has grouped output by 'policeDistrict'. You can override using
-    the `.groups` argument.
-
-``` r
 # for summer
 summer_df <- df2 %>%
   filter(seasons == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarise(avg_calls = mean(callscount, na.rm = TRUE))
-```
 
-    `summarise()` has grouped output by 'policeDistrict'. You can override using
-    the `.groups` argument.
-
-``` r
 # Scatter plot -winter
 greenPalette <- c("#003300", "#004d00", "#006600", "#008000", "#009900", "#00b300", "#00cc00", "#33cc33", "#66ff66")
 
@@ -219,10 +209,9 @@ ggplot(winter_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)
   scale_color_manual(values = greenPalette) +
   labs(title = "Average Number of Calls vs Temperature (F) by Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
-       y = "Average Number of Calls")
+       y = "Average Number of Calls") +
+  theme_bw()
 ```
-
-    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-1.png)
 
@@ -235,16 +224,15 @@ ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)
   #scale_color_manual(values = c("#006400", "#228B22", "#32CD32", "#7FFF00", "#ADFF2F")) +
   labs(title = "Average Number of Calls vs Temperature (F) by Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
-       y = "Average Number of Calls")
+       y = "Average Number of Calls") +
+  theme_bw()
 ```
-
-    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-2.png)
 
 ``` r
 #----------------------------------------------------------------------------------------------
-# We will not be using these graphs
+# We will not be using these graphs (I think so)
 
 
 # for winter
@@ -252,30 +240,21 @@ df_winter <- df2 %>%
   filter(seasons == 1) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
-```
 
-    `summarise()` has grouped output by 'policeDistrict'. You can override using
-    the `.groups` argument.
-
-``` r
 # for summer
 df_summer <- df2 %>%
   filter(seasons == 0) %>%
   group_by(policeDistrict, tempCatagories) %>%
   summarize(total_callscount = sum(callscount))
-```
 
-    `summarise()` has grouped output by 'policeDistrict'. You can override using
-    the `.groups` argument.
-
-``` r
 # Grouped bar graph -winter
 ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
     geom_bar(stat="identity") +
     facet_wrap((~ as.character(policeDistrict))) +
     labs(title = "Total Number of Calls per Police District (Winter 11-2)",
        x = "Temperature Range (F)", 
-       y = "Total Number of Calls")
+       y = "Total Number of Calls") +
+  theme_bw()
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-3.png)
@@ -287,7 +266,8 @@ ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) +
     facet_wrap((~ as.character(policeDistrict))) +
     labs(title = "Total Number of Calls per Police District (Summer 4-9)",
        x = "Temperature Range (F)", 
-       y = "Total Number of Calls")
+       y = "Total Number of Calls") +
+  theme_bw()
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-4.png)
@@ -1429,18 +1409,155 @@ summary(model5)
 The Map: (not done yet)
 
 ``` r
+# for summer
+model6<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               holiday_bin |
+               #year + month + dow, data=df4s)
+               policeDistrict + year + month + dow, data=df4s)
+
+summary(model6)
+```
+
+
+    Call:
+       felm(formula = call_bin ~ temp_F:as.factor(policeDistrict) +      holiday_bin | policeDistrict + year + month + dow, data = df4s) 
+
+    Residuals:
+         Min       1Q   Median       3Q      Max 
+    -0.43895 -0.18558 -0.12940 -0.06832  0.98970 
+
+    Coefficients:
+                                                   Estimate Std. Error t value
+    holiday_bin                                   0.0508984  0.0302248   1.684
+    temp_F:as.factor(policeDistrict)Central      -0.0009550  0.0014700  -0.650
+    temp_F:as.factor(policeDistrict)Eastern       0.0001648  0.0015378   0.107
+    temp_F:as.factor(policeDistrict)Northeastern -0.0001467  0.0016240  -0.090
+    temp_F:as.factor(policeDistrict)Northern     -0.0007753  0.0016896  -0.459
+    temp_F:as.factor(policeDistrict)Northwestern  0.0018702  0.0016798   1.113
+    temp_F:as.factor(policeDistrict)Southeastern -0.0006940  0.0014842  -0.468
+    temp_F:as.factor(policeDistrict)Southern      0.0006162  0.0015805   0.390
+    temp_F:as.factor(policeDistrict)Southwestern -0.0003609  0.0015695  -0.230
+    temp_F:as.factor(policeDistrict)Western      -0.0009668  0.0015843  -0.610
+                                                 Pr(>|t|)  
+    holiday_bin                                    0.0923 .
+    temp_F:as.factor(policeDistrict)Central        0.5160  
+    temp_F:as.factor(policeDistrict)Eastern        0.9146  
+    temp_F:as.factor(policeDistrict)Northeastern   0.9280  
+    temp_F:as.factor(policeDistrict)Northern       0.6464  
+    temp_F:as.factor(policeDistrict)Northwestern   0.2656  
+    temp_F:as.factor(policeDistrict)Southeastern   0.6401  
+    temp_F:as.factor(policeDistrict)Southern       0.6966  
+    temp_F:as.factor(policeDistrict)Southwestern   0.8182  
+    temp_F:as.factor(policeDistrict)Western        0.5417  
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+    Residual standard error: 0.3614 on 2826 degrees of freedom
+    Multiple R-squared(full model): 0.04363   Adjusted R-squared: 0.03314 
+    Multiple R-squared(proj model): 0.002015   Adjusted R-squared: -0.008932 
+    F-statistic(full model):4.159 on 31 and 2826 DF, p-value: 1.567e-13 
+    F-statistic(proj model): 0.5707 on 10 and 2826 DF, p-value: 0.8391 
+    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+
+``` r
+# for winter
+model7<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               holiday_bin |
+               #year + month + dow, data=df4w)
+               policeDistrict + year + month + dow, data=df4w)
+
+summary(model7)
+```
+
+
+    Call:
+       felm(formula = call_bin ~ temp_F:as.factor(policeDistrict) +      holiday_bin | policeDistrict + year + month + dow, data = df4w) 
+
+    Residuals:
+         Min       1Q   Median       3Q      Max 
+    -0.39311 -0.16921 -0.11406 -0.05628  0.97698 
+
+    Coefficients:
+                                                   Estimate Std. Error t value
+    holiday_bin                                   0.0096733  0.0221998   0.436
+    temp_F:as.factor(policeDistrict)Central      -0.0010398  0.0022140  -0.470
+    temp_F:as.factor(policeDistrict)Eastern      -0.0001305  0.0022839  -0.057
+    temp_F:as.factor(policeDistrict)Northeastern -0.0022759  0.0021994  -1.035
+    temp_F:as.factor(policeDistrict)Northern      0.0023277  0.0022951   1.014
+    temp_F:as.factor(policeDistrict)Northwestern  0.0036696  0.0022076   1.662
+    temp_F:as.factor(policeDistrict)Southeastern -0.0013753  0.0021702  -0.634
+    temp_F:as.factor(policeDistrict)Southern      0.0019048  0.0022473   0.848
+    temp_F:as.factor(policeDistrict)Southwestern  0.0018269  0.0021278   0.859
+    temp_F:as.factor(policeDistrict)Western      -0.0032152  0.0021779  -1.476
+                                                 Pr(>|t|)  
+    holiday_bin                                    0.6631  
+    temp_F:as.factor(policeDistrict)Central        0.6387  
+    temp_F:as.factor(policeDistrict)Eastern        0.9544  
+    temp_F:as.factor(policeDistrict)Northeastern   0.3009  
+    temp_F:as.factor(policeDistrict)Northern       0.3106  
+    temp_F:as.factor(policeDistrict)Northwestern   0.0966 .
+    temp_F:as.factor(policeDistrict)Southeastern   0.5263  
+    temp_F:as.factor(policeDistrict)Southern       0.3968  
+    temp_F:as.factor(policeDistrict)Southwestern   0.3907  
+    temp_F:as.factor(policeDistrict)Western        0.1400  
+    ---
+    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+    Residual standard error: 0.3452 on 1933 degrees of freedom
+    Multiple R-squared(full model): 0.04316   Adjusted R-squared: 0.02831 
+    Multiple R-squared(proj model): 0.005007   Adjusted R-squared: -0.01044 
+    F-statistic(full model):2.907 on 30 and 1933 DF, p-value: 2.706e-07 
+    F-statistic(proj model): 0.9727 on 10 and 1933 DF, p-value: 0.4652 
+    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+
+``` r
 library("terra")
+
 
 police_districts<-vect("/Users/roshan/Downloads/UMD/Fall-2024/FIRE298/research-Greenspace/Police_Districts_2023/Police_Districts_2023.shp")
 
-# baltimore <- c("21201", "21202", "21205", "21206", "21207", "21208", "21209", "21210", "21211", "21212", "21213", "21214", "21215", "21216", "21217", "21218", "21222", "21223", "21224", "21225", "21226", "21227", "21228", "21229", "21230", "21231", "21234", "21236", "21237", "21239", "21251", "21287")
+# for summer
+police_districts$trt_summer <- 0
 
-police_districts$trt <- 0
+police_districts$trt_summer[police_districts$Dist_Name=="Central"] <- -0.09550
+police_districts$trt_summer[police_districts$Dist_Name=="Eastern"] <- 0.01648
+police_districts$trt_summer[police_districts$Dist_Name=="Northeastern"] <- -0.01467
+police_districts$trt_summer[police_districts$Dist_Name=="Northern"] <- -0.07753
+police_districts$trt_summer[police_districts$Dist_Name=="Northwestern"] <- 0.18702
+police_districts$trt_summer[police_districts$Dist_Name=="Southeastern"] <- -0.06940
+police_districts$trt_summer[police_districts$Dist_Name=="Southern"] <- 0.06162
+police_districts$trt_summer[police_districts$Dist_Name=="Southwestern"] <- -0.03609
+police_districts$trt_summer[police_districts$Dist_Name=="Western"] <- -0.09668
 
-plot(police_districts, "trt", col=map.pal("greens"))
+png("map_summer.png", width=6, height=4, unit="in", res=500)
+plot(police_districts, "trt_summer", col=map.pal("greens"))
+dev.off()
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-10-1.png)
+    quartz_off_screen 
+                    2 
+
+``` r
+# for winter
+police_districts$trt_winter <- 0
+
+police_districts$trt_winter[police_districts$Dist_Name=="Central"] <- -0.10398
+police_districts$trt_winter[police_districts$Dist_Name=="Eastern"] <- -0.01305
+police_districts$trt_winter[police_districts$Dist_Name=="Northeastern"] <- -0.22759
+police_districts$trt_winter[police_districts$Dist_Name=="Northern"] <- 0.23277
+police_districts$trt_winter[police_districts$Dist_Name=="Northwestern"] <- 0.36696
+police_districts$trt_winter[police_districts$Dist_Name=="Southeastern"] <- -0.13753
+police_districts$trt_winter[police_districts$Dist_Name=="Southern"] <- 0.19048
+police_districts$trt_winter[police_districts$Dist_Name=="Southwestern"] <- 0.18269
+police_districts$trt_winter[police_districts$Dist_Name=="Western"] <- -0.32152
+
+png("map_winter.png", width=6, height=4, unit="in", res=500)
+plot(police_districts, "trt_winter", col=map.pal("greens"))
+dev.off()
+```
+
+    quartz_off_screen 
+                    2 
 
 Future Plans:
 
