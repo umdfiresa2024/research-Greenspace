@@ -399,24 +399,24 @@ summary(model4)
 summary(model5)
 ```
 
-The Map: (not done yet)
+There are 2 different maps. The summer map represents the regressions in the summer per police district in Baltimore city. The winter map represents the regression in the winter per police district in Baltimore city.
 
 ```{r}
 # for summer
-model6<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
-               holiday_bin |
+#model6<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               #holiday_bin |
                #year + month + dow, data=df4s)
-               policeDistrict + year + month + dow, data=df4s)
+               #policeDistrict + year + month + dow, data=df4s)
 
-summary(model6)
+#summary(model6)
 
 # for winter
-model7<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
-               holiday_bin |
+#model7<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               #holiday_bin |
                #year + month + dow, data=df4w)
-               policeDistrict + year + month + dow, data=df4w)
+               #policeDistrict + year + month + dow, data=df4w)
 
-summary(model7)
+#summary(model7)
 
 ```
 

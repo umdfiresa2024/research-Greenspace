@@ -1406,109 +1406,28 @@ summary(model5)
     F-statistic(proj model): 0.965 on 190 and 2713 DF, p-value: 0.6191 
     *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
 
-The Map: (not done yet)
+There are 2 different maps. The summer map represents the regressions in
+the summer per police district in Baltimore city. The winter map
+represents the regression in the winter per police district in Baltimore
+city.
 
 ``` r
 # for summer
-model6<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
-               holiday_bin |
+#model6<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               #holiday_bin |
                #year + month + dow, data=df4s)
-               policeDistrict + year + month + dow, data=df4s)
+               #policeDistrict + year + month + dow, data=df4s)
 
-summary(model6)
-```
+#summary(model6)
 
-
-    Call:
-       felm(formula = call_bin ~ temp_F:as.factor(policeDistrict) +      holiday_bin | policeDistrict + year + month + dow, data = df4s) 
-
-    Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.43895 -0.18558 -0.12940 -0.06832  0.98970 
-
-    Coefficients:
-                                                   Estimate Std. Error t value
-    holiday_bin                                   0.0508984  0.0302248   1.684
-    temp_F:as.factor(policeDistrict)Central      -0.0009550  0.0014700  -0.650
-    temp_F:as.factor(policeDistrict)Eastern       0.0001648  0.0015378   0.107
-    temp_F:as.factor(policeDistrict)Northeastern -0.0001467  0.0016240  -0.090
-    temp_F:as.factor(policeDistrict)Northern     -0.0007753  0.0016896  -0.459
-    temp_F:as.factor(policeDistrict)Northwestern  0.0018702  0.0016798   1.113
-    temp_F:as.factor(policeDistrict)Southeastern -0.0006940  0.0014842  -0.468
-    temp_F:as.factor(policeDistrict)Southern      0.0006162  0.0015805   0.390
-    temp_F:as.factor(policeDistrict)Southwestern -0.0003609  0.0015695  -0.230
-    temp_F:as.factor(policeDistrict)Western      -0.0009668  0.0015843  -0.610
-                                                 Pr(>|t|)  
-    holiday_bin                                    0.0923 .
-    temp_F:as.factor(policeDistrict)Central        0.5160  
-    temp_F:as.factor(policeDistrict)Eastern        0.9146  
-    temp_F:as.factor(policeDistrict)Northeastern   0.9280  
-    temp_F:as.factor(policeDistrict)Northern       0.6464  
-    temp_F:as.factor(policeDistrict)Northwestern   0.2656  
-    temp_F:as.factor(policeDistrict)Southeastern   0.6401  
-    temp_F:as.factor(policeDistrict)Southern       0.6966  
-    temp_F:as.factor(policeDistrict)Southwestern   0.8182  
-    temp_F:as.factor(policeDistrict)Western        0.5417  
-    ---
-    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-    Residual standard error: 0.3614 on 2826 degrees of freedom
-    Multiple R-squared(full model): 0.04363   Adjusted R-squared: 0.03314 
-    Multiple R-squared(proj model): 0.002015   Adjusted R-squared: -0.008932 
-    F-statistic(full model):4.159 on 31 and 2826 DF, p-value: 1.567e-13 
-    F-statistic(proj model): 0.5707 on 10 and 2826 DF, p-value: 0.8391 
-    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
-
-``` r
 # for winter
-model7<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
-               holiday_bin |
+#model7<-felm(call_bin ~ temp_F:as.factor(policeDistrict) +
+               #holiday_bin |
                #year + month + dow, data=df4w)
-               policeDistrict + year + month + dow, data=df4w)
+               #policeDistrict + year + month + dow, data=df4w)
 
-summary(model7)
+#summary(model7)
 ```
-
-
-    Call:
-       felm(formula = call_bin ~ temp_F:as.factor(policeDistrict) +      holiday_bin | policeDistrict + year + month + dow, data = df4w) 
-
-    Residuals:
-         Min       1Q   Median       3Q      Max 
-    -0.39311 -0.16921 -0.11406 -0.05628  0.97698 
-
-    Coefficients:
-                                                   Estimate Std. Error t value
-    holiday_bin                                   0.0096733  0.0221998   0.436
-    temp_F:as.factor(policeDistrict)Central      -0.0010398  0.0022140  -0.470
-    temp_F:as.factor(policeDistrict)Eastern      -0.0001305  0.0022839  -0.057
-    temp_F:as.factor(policeDistrict)Northeastern -0.0022759  0.0021994  -1.035
-    temp_F:as.factor(policeDistrict)Northern      0.0023277  0.0022951   1.014
-    temp_F:as.factor(policeDistrict)Northwestern  0.0036696  0.0022076   1.662
-    temp_F:as.factor(policeDistrict)Southeastern -0.0013753  0.0021702  -0.634
-    temp_F:as.factor(policeDistrict)Southern      0.0019048  0.0022473   0.848
-    temp_F:as.factor(policeDistrict)Southwestern  0.0018269  0.0021278   0.859
-    temp_F:as.factor(policeDistrict)Western      -0.0032152  0.0021779  -1.476
-                                                 Pr(>|t|)  
-    holiday_bin                                    0.6631  
-    temp_F:as.factor(policeDistrict)Central        0.6387  
-    temp_F:as.factor(policeDistrict)Eastern        0.9544  
-    temp_F:as.factor(policeDistrict)Northeastern   0.3009  
-    temp_F:as.factor(policeDistrict)Northern       0.3106  
-    temp_F:as.factor(policeDistrict)Northwestern   0.0966 .
-    temp_F:as.factor(policeDistrict)Southeastern   0.5263  
-    temp_F:as.factor(policeDistrict)Southern       0.3968  
-    temp_F:as.factor(policeDistrict)Southwestern   0.3907  
-    temp_F:as.factor(policeDistrict)Western        0.1400  
-    ---
-    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-    Residual standard error: 0.3452 on 1933 degrees of freedom
-    Multiple R-squared(full model): 0.04316   Adjusted R-squared: 0.02831 
-    Multiple R-squared(proj model): 0.005007   Adjusted R-squared: -0.01044 
-    F-statistic(full model):2.907 on 30 and 1933 DF, p-value: 2.706e-07 
-    F-statistic(proj model): 0.9727 on 10 and 1933 DF, p-value: 0.4652 
-    *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
 
 ``` r
 library("terra")
