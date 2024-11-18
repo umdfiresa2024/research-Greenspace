@@ -409,6 +409,10 @@ modelplot(model4, coef_omit = 'holiday_bin')+
   labs(title="Summer Results")
 ```
 
+```{r}
+#df4w$predicted_calls<-model2$fitted.values
+```
+
 There are 2 different maps. The summer map represents the regressions in the summer per police district in Baltimore city. The winter map represents the regression in the winter per police district in Baltimore city.
 
 ```{r}
