@@ -333,31 +333,31 @@ model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
                policeDistrict + year + month + dow, data=df4w)
 
 
-model3<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
-               temp_95_100:as.factor(policeDistrict) + 
-               temp_90_95:as.factor(policeDistrict) + 
-               temp_85_90:as.factor(policeDistrict) + 
-               temp_80_85:as.factor(policeDistrict) +
-               temp_75_80:as.factor(policeDistrict) + 
-               temp_70_75:as.factor(policeDistrict) + 
-               temp_65_70:as.factor(policeDistrict) + 
-               temp_60_65:as.factor(policeDistrict) + 
-               temp_50_55:as.factor(policeDistrict) + 
-               temp_45_50:as.factor(policeDistrict) + 
-               temp_40_45:as.factor(policeDistrict) + 
-               temp_35_40:as.factor(policeDistrict) + 
-               temp_30_35:as.factor(policeDistrict) + 
-               temp_25_30:as.factor(policeDistrict) + 
-               temp_20_25:as.factor(policeDistrict) + 
-               temp_15_20:as.factor(policeDistrict) + 
-               temp_10_15:as.factor(policeDistrict) + 
-               temp_5_10:as.factor(policeDistrict) + 
-               temp_0_5:as.factor(policeDistrict) + 
-               temp_under_0:as.factor(policeDistrict) + 
-               holiday_bin | year + month + dow, data=df4w)
+# model3<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
+#                temp_95_100:as.factor(policeDistrict) + 
+#                temp_90_95:as.factor(policeDistrict) + 
+#                temp_85_90:as.factor(policeDistrict) + 
+#                temp_80_85:as.factor(policeDistrict) +
+#                temp_75_80:as.factor(policeDistrict) + 
+#                temp_70_75:as.factor(policeDistrict) + 
+#                temp_65_70:as.factor(policeDistrict) + 
+#                temp_60_65:as.factor(policeDistrict) + 
+#                temp_50_55:as.factor(policeDistrict) + 
+#                temp_45_50:as.factor(policeDistrict) + 
+#                temp_40_45:as.factor(policeDistrict) + 
+#                temp_35_40:as.factor(policeDistrict) + 
+#                temp_30_35:as.factor(policeDistrict) + 
+#                temp_25_30:as.factor(policeDistrict) + 
+#                temp_20_25:as.factor(policeDistrict) + 
+#                temp_15_20:as.factor(policeDistrict) + 
+#                temp_10_15:as.factor(policeDistrict) + 
+#                temp_5_10:as.factor(policeDistrict) + 
+#                temp_0_5:as.factor(policeDistrict) + 
+#                temp_under_0:as.factor(policeDistrict) + 
+#                holiday_bin | year + month + dow, data=df4w)
 
 summary(model2)
-summary(model3)
+#summary(model3)
 
 #-------#
 
@@ -372,31 +372,41 @@ model4<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
                policeDistrict + year + month + dow, data=df4s)
 
 
-model5<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
-               temp_95_100:as.factor(policeDistrict) + 
-               temp_90_95:as.factor(policeDistrict) + 
-               temp_85_90:as.factor(policeDistrict) + 
-               temp_80_85:as.factor(policeDistrict) +
-               temp_75_80:as.factor(policeDistrict) + 
-               temp_70_75:as.factor(policeDistrict) + 
-               temp_65_70:as.factor(policeDistrict) + 
-               temp_60_65:as.factor(policeDistrict) + 
-               temp_50_55:as.factor(policeDistrict) + 
-               temp_45_50:as.factor(policeDistrict) + 
-               temp_40_45:as.factor(policeDistrict) + 
-               temp_35_40:as.factor(policeDistrict) + 
-               temp_30_35:as.factor(policeDistrict) + 
-               temp_25_30:as.factor(policeDistrict) + 
-               temp_20_25:as.factor(policeDistrict) + 
-               temp_15_20:as.factor(policeDistrict) + 
-               temp_10_15:as.factor(policeDistrict) + 
-               temp_5_10:as.factor(policeDistrict) + 
-               temp_0_5:as.factor(policeDistrict) + 
-               temp_under_0:as.factor(policeDistrict) + 
-               holiday_bin | year + month + dow, data=df4s)
+# model5<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
+#                temp_95_100:as.factor(policeDistrict) + 
+#                temp_90_95:as.factor(policeDistrict) + 
+#                temp_85_90:as.factor(policeDistrict) + 
+#                temp_80_85:as.factor(policeDistrict) +
+#                temp_75_80:as.factor(policeDistrict) + 
+#                temp_70_75:as.factor(policeDistrict) + 
+#                temp_65_70:as.factor(policeDistrict) + 
+#                temp_60_65:as.factor(policeDistrict) + 
+#                temp_50_55:as.factor(policeDistrict) + 
+#                temp_45_50:as.factor(policeDistrict) + 
+#                temp_40_45:as.factor(policeDistrict) + 
+#                temp_35_40:as.factor(policeDistrict) + 
+#                temp_30_35:as.factor(policeDistrict) + 
+#                temp_25_30:as.factor(policeDistrict) + 
+#                temp_20_25:as.factor(policeDistrict) + 
+#                temp_15_20:as.factor(policeDistrict) + 
+#                temp_10_15:as.factor(policeDistrict) + 
+#                temp_5_10:as.factor(policeDistrict) + 
+#                temp_0_5:as.factor(policeDistrict) + 
+#                temp_under_0:as.factor(policeDistrict) + 
+#                holiday_bin | year + month + dow, data=df4s)
 
 summary(model4)
-summary(model5)
+#summary(model5)
+```
+
+```{r}
+library(modelsummary)
+
+modelplot(model2, coef_omit = 'holiday_bin') +
+  labs(title="Winter Results")
+
+modelplot(model4, coef_omit = 'holiday_bin')+
+  labs(title="Summer Results")
 ```
 
 There are 2 different maps. The summer map represents the regressions in the summer per police district in Baltimore city. The winter map represents the regression in the winter per police district in Baltimore city.
@@ -443,9 +453,9 @@ police_districts$trt_summer[police_districts$Dist_Name=="Southern"] <- 0.06162
 police_districts$trt_summer[police_districts$Dist_Name=="Southwestern"] <- -0.03609
 police_districts$trt_summer[police_districts$Dist_Name=="Western"] <- -0.09668
 
-png("map_summer.png", width=6, height=4, unit="in", res=500)
+#png("map_summer.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_summer", col=map.pal("greens"))
-dev.off()
+#dev.off()
 
 
 
@@ -462,9 +472,9 @@ police_districts$trt_winter[police_districts$Dist_Name=="Southern"] <- 0.19048
 police_districts$trt_winter[police_districts$Dist_Name=="Southwestern"] <- 0.18269
 police_districts$trt_winter[police_districts$Dist_Name=="Western"] <- -0.32152
 
-png("map_winter.png", width=6, height=4, unit="in", res=500)
+#png("map_winter.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_winter", col=map.pal("greens"))
-dev.off()
+#dev.off()
 
 ```
 
