@@ -206,10 +206,6 @@ ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) +
 ```
 
 \
-\
-
-![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
-
 The following shows our regression model $y=\beta_0 + \beta_1 x + \epsilon$ where $y$ is the outcome variable and $x$ is the treatment variable.
 
 ```{r}
@@ -332,35 +328,7 @@ model2<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
                holiday_bin |
                policeDistrict + year + month + dow, data=df4w)
 
-
-# model3<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
-#                temp_95_100:as.factor(policeDistrict) + 
-#                temp_90_95:as.factor(policeDistrict) + 
-#                temp_85_90:as.factor(policeDistrict) + 
-#                temp_80_85:as.factor(policeDistrict) +
-#                temp_75_80:as.factor(policeDistrict) + 
-#                temp_70_75:as.factor(policeDistrict) + 
-#                temp_65_70:as.factor(policeDistrict) + 
-#                temp_60_65:as.factor(policeDistrict) + 
-#                temp_50_55:as.factor(policeDistrict) + 
-#                temp_45_50:as.factor(policeDistrict) + 
-#                temp_40_45:as.factor(policeDistrict) + 
-#                temp_35_40:as.factor(policeDistrict) + 
-#                temp_30_35:as.factor(policeDistrict) + 
-#                temp_25_30:as.factor(policeDistrict) + 
-#                temp_20_25:as.factor(policeDistrict) + 
-#                temp_15_20:as.factor(policeDistrict) + 
-#                temp_10_15:as.factor(policeDistrict) + 
-#                temp_5_10:as.factor(policeDistrict) + 
-#                temp_0_5:as.factor(policeDistrict) + 
-#                temp_under_0:as.factor(policeDistrict) + 
-#                holiday_bin | year + month + dow, data=df4w)
-
 summary(model2)
-#summary(model3)
-
-#-------#
-
 
 # This is for the summer months
 df4s<-df3 %>%
@@ -371,32 +339,7 @@ model4<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
                holiday_bin |
                policeDistrict + year + month + dow, data=df4s)
 
-
-# model5<-felm(call_bin ~ temp_over_100:as.factor(policeDistrict) + 
-#                temp_95_100:as.factor(policeDistrict) + 
-#                temp_90_95:as.factor(policeDistrict) + 
-#                temp_85_90:as.factor(policeDistrict) + 
-#                temp_80_85:as.factor(policeDistrict) +
-#                temp_75_80:as.factor(policeDistrict) + 
-#                temp_70_75:as.factor(policeDistrict) + 
-#                temp_65_70:as.factor(policeDistrict) + 
-#                temp_60_65:as.factor(policeDistrict) + 
-#                temp_50_55:as.factor(policeDistrict) + 
-#                temp_45_50:as.factor(policeDistrict) + 
-#                temp_40_45:as.factor(policeDistrict) + 
-#                temp_35_40:as.factor(policeDistrict) + 
-#                temp_30_35:as.factor(policeDistrict) + 
-#                temp_25_30:as.factor(policeDistrict) + 
-#                temp_20_25:as.factor(policeDistrict) + 
-#                temp_15_20:as.factor(policeDistrict) + 
-#                temp_10_15:as.factor(policeDistrict) + 
-#                temp_5_10:as.factor(policeDistrict) + 
-#                temp_0_5:as.factor(policeDistrict) + 
-#                temp_under_0:as.factor(policeDistrict) + 
-#                holiday_bin | year + month + dow, data=df4s)
-
 summary(model4)
-#summary(model5)
 ```
 
 ```{r}
@@ -442,7 +385,7 @@ There are 2 different maps. The summer map represents the regressions in the sum
 library("terra")
 
 
-police_districts<-vect("/Users/roshan/Downloads/UMD/Fall-2024/FIRE298/research-Greenspace/Police_Districts_2023/Police_Districts_2023.shp")
+police_districts<-vect("Police_Districts_2023/Police_Districts_2023.shp")
 
 # for summer
 police_districts$trt_summer <- 0
