@@ -64,18 +64,6 @@ Besides existing studies on the link between temperatures and mental health, the
 
 Our study will differ from existing studies on temperature and mental health on several key points. We will be analyzing a more controlled location and group, focussing on Baltimore City, allowing us to control for factors specific to the police district. We will be using some of the same strategies as other studies (Burke et al., 2018; Srivastava & Mullins., 2024; Heilmann et al., 2021) such as controlling for factors of precipitation, air quality, and holidays. As well as adding an extra factor of our own, greenspace. Our data will be more modern mental health crisis call data from 2021-2023 and analyzed daily to account for factors such as day of week.
 
-**Bibliography:** 
-
-Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu, S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in the United States and Mexico. Nature Climate Change, 8(8), 723–729. <https://doi.org/10.1038/s41558-018-0222-x> 
-
-Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global Climate Change. Climate Change: Vital Signs of the Planet. Retrieved October 22, 2024, from <https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
-
-Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith, G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives on heat and health in Baltimore City. Urban Climate, 54, 101841. <https://doi.org/10.1016/j.uclim.2024.101841> 
-
-Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and heat gradient in high and low poverty areas. Journal of Public Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
-
-Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and Individual Crises: Evidence from Crisis Text Line. American Journal of Health Economics. <https://doi.org/10.1086/730332> 
-
 ## Methods:
 
 The frequency of this data frame is Daily.
@@ -170,39 +158,6 @@ ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)
        y = "Average Number of Calls") +
   theme_bw()
 
-#----------------------------------------------------------------------------------------------
-# We will not be using these graphs (I think so)
-
-
-# for winter
-df_winter <- df2 %>%
-  filter(seasons == 1) %>%
-  group_by(policeDistrict, tempCatagories) %>%
-  summarize(total_callscount = sum(callscount))
-
-# for summer
-df_summer <- df2 %>%
-  filter(seasons == 0) %>%
-  group_by(policeDistrict, tempCatagories) %>%
-  summarize(total_callscount = sum(callscount))
-
-# Grouped bar graph -winter
-ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Winter 11-2)",
-       x = "Temperature Range (F)", 
-       y = "Total Number of Calls") +
-  theme_bw()
-
-# Grouped bar graph -summer
-ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Summer 4-9)",
-       x = "Temperature Range (F)", 
-       y = "Total Number of Calls") +
-  theme_bw()
 ```
 
 \
@@ -342,20 +297,6 @@ model4<-felm(call_bin ~ temp_over_100 + temp_95_100 + temp_90_95 + temp_85_90 + 
 summary(model4)
 ```
 
-```{r}
-library(modelsummary)
-
-modelplot(model2, coef_omit = 'holiday_bin') +
-  labs(title="Winter Results")
-
-modelplot(model4, coef_omit = 'holiday_bin')+
-  labs(title="Summer Results")
-```
-
-```{r}
-#df4w$predicted_calls<-model2$fitted.values
-```
-
 There are 2 different maps. The summer map represents the regressions in the summer per police district in Baltimore city. The winter map represents the regression in the winter per police district in Baltimore city.
 
 ```{r}
@@ -400,9 +341,9 @@ police_districts$trt_summer[police_districts$Dist_Name=="Southern"] <- 0.06162
 police_districts$trt_summer[police_districts$Dist_Name=="Southwestern"] <- -0.03609
 police_districts$trt_summer[police_districts$Dist_Name=="Western"] <- -0.09668
 
-#png("map_summer.png", width=6, height=4, unit="in", res=500)
+png("map_summer.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_summer", col=map.pal("greens"))
-#dev.off()
+dev.off()
 
 
 
@@ -419,13 +360,19 @@ police_districts$trt_winter[police_districts$Dist_Name=="Southern"] <- 0.19048
 police_districts$trt_winter[police_districts$Dist_Name=="Southwestern"] <- 0.18269
 police_districts$trt_winter[police_districts$Dist_Name=="Western"] <- -0.32152
 
-#png("map_winter.png", width=6, height=4, unit="in", res=500)
+png("map_winter.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_winter", col=map.pal("greens"))
-#dev.off()
+dev.off()
 
 ```
 
-Future Plans:
+## Discussion:
+
+Our findings showed that during the winter months, there is an increase in mental health related calls as the temperature becomes either hotter or significantly colder. Similarly, during summer months, there is an increase in mental health related calls as the temperature rises. These results correlated with our initial scatter plots which showed more mental health related calls associated with extreme temperatures. After running regressions per each police district in Baltimore City, they showed that both in the summer and winter for every 1% of increase in temperature there are some police districts where there is some amount of increase in the number of calls received while in others there is a decrease. A related study, Burke et al. (2018) found a similar relationship between temperature and the amount of suicides that occur. They found that there is an increase by 0.7% in suicide rate per 1.8 degrees Fahrenheit rise in temperature. Additionally, Janzen (2022) stated that cold weather forces people to have more alone time leading to feelings of sadness. The feeling of sadness causes poor mental health thus leading to more distress calls explaining why colder temperatures lead to a greater amount of calls.
+
+There are still the ways to improve our research. We plan to use data about the human comfort index instead of using ground temperature. We also plan to taken into the frequency of extreme temperature into account.
+
+## Future Plans:
 
 -   Alter the graph so that it shows the relationship between specific temperature periods to the number of calls
 
@@ -440,3 +387,19 @@ Future Plans:
     -   trees
 
     -   air quality
+
+## **Bibliography:** 
+
+Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu, S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in the United States and Mexico. Nature Climate Change, 8(8), 723–729. <https://doi.org/10.1038/s41558-018-0222-x> 
+
+Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global Climate Change. Climate Change: Vital Signs of the Planet. Retrieved October 22, 2024, from <https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
+
+Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith, G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives on heat and health in Baltimore City. Urban Climate, 54, 101841. <https://doi.org/10.1016/j.uclim.2024.101841> 
+
+Evans, M., Gazze, L., & Schaller, J. (2023). Temperature and maltreatment of young children. <https://doi.org/10.3386/w31522>).
+
+Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and heat gradient in high and low poverty areas. Journal of Public Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
+
+Janzen, B. (2022). Temperature and Mental Health: Evidence from Helpline Calls. ArXiv. <https://arxiv.org/abs/2207.04992>
+
+Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and Individual Crises: Evidence from Crisis Text Line. American Journal of Health Economics. <https://doi.org/10.1086/730332> 

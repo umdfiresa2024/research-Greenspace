@@ -103,31 +103,6 @@ factor of our own, greenspace. Our data will be more modern mental
 health crisis call data from 2021-2023 and analyzed daily to account for
 factors such as day of week.
 
-**Bibliography:** 
-
-Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu,
-S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in
-the United States and Mexico. Nature Climate Change, 8(8), 723–729.
-<https://doi.org/10.1038/s41558-018-0222-x> 
-
-Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global
-Climate Change. Climate Change: Vital Signs of the Planet. Retrieved
-October 22, 2024, from
-<https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
-
-Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith,
-G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives
-on heat and health in Baltimore City. Urban Climate, 54, 101841.
-<https://doi.org/10.1016/j.uclim.2024.101841> 
-
-Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and
-heat gradient in high and low poverty areas. Journal of Public
-Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
-
-Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and
-Individual Crises: Evidence from Crisis Text Line. American Journal of
-Health Economics. <https://doi.org/10.1086/730332> 
-
 ## Methods:
 
 The frequency of this data frame is Daily.
@@ -229,48 +204,6 @@ ggplot(summer_df, aes(x = tempCatagories, y = avg_calls, color = policeDistrict)
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-6-2.png)
-
-``` r
-#----------------------------------------------------------------------------------------------
-# We will not be using these graphs (I think so)
-
-
-# for winter
-df_winter <- df2 %>%
-  filter(seasons == 1) %>%
-  group_by(policeDistrict, tempCatagories) %>%
-  summarize(total_callscount = sum(callscount))
-
-# for summer
-df_summer <- df2 %>%
-  filter(seasons == 0) %>%
-  group_by(policeDistrict, tempCatagories) %>%
-  summarize(total_callscount = sum(callscount))
-
-# Grouped bar graph -winter
-ggplot(df_winter, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Winter 11-2)",
-       x = "Temperature Range (F)", 
-       y = "Total Number of Calls") +
-  theme_bw()
-```
-
-![](README_files/figure-commonmark/unnamed-chunk-6-3.png)
-
-``` r
-# Grouped bar graph -summer
-ggplot(df_summer, aes(x = tempCatagories, y = total_callscount)) + 
-    geom_bar(stat="identity") +
-    facet_wrap((~ as.character(policeDistrict))) +
-    labs(title = "Total Number of Calls per Police District (Summer 4-9)",
-       x = "Temperature Range (F)", 
-       y = "Total Number of Calls") +
-  theme_bw()
-```
-
-![](README_files/figure-commonmark/unnamed-chunk-6-4.png)
 
   
 The following shows our regression model
@@ -507,30 +440,30 @@ summary(model4)
     -0.4446 -0.1888 -0.1252 -0.0628  1.0078 
 
     Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)  
-    temp_over_100  0.19132    0.18643   1.026   0.3049  
-    temp_95_100    0.12614    0.18427   0.685   0.4937  
-    temp_90_95     0.11746    0.18353   0.640   0.5222  
-    temp_85_90     0.10263    0.18285   0.561   0.5747  
-    temp_80_85     0.10397    0.18288   0.568   0.5697  
-    temp_75_80     0.11517    0.18290   0.630   0.5289  
-    temp_70_75     0.17757    0.18274   0.972   0.3313  
-    temp_65_70     0.12298    0.18317   0.671   0.5020  
-    temp_60_65     0.16626    0.18328   0.907   0.3644  
-    temp_55_60     0.11480    0.18388   0.624   0.5325  
-    temp_50_55     0.11731    0.18776   0.625   0.5321  
-    temp_45_50     0.10397    0.19359   0.537   0.5913  
-    temp_40_45     0.07998    0.19721   0.406   0.6851  
-    temp_35_40     0.16341    0.20750   0.788   0.4310  
-    temp_30_35    -0.04843    0.23317  -0.208   0.8355  
-    temp_25_30     0.23606    0.25527   0.925   0.3552  
-    temp_20_25     0.96762    0.40391   2.396   0.0167 *
-    temp_15_20         NaN         NA     NaN      NaN  
-    temp_10_15         NaN         NA     NaN      NaN  
-    temp_5_10          NaN         NA     NaN      NaN  
-    temp_0_5           NaN         NA     NaN      NaN  
-    temp_under_0       NaN         NA     NaN      NaN  
-    holiday_bin    0.05034    0.03037   1.658   0.0975 .
+                  Estimate Std. Error t value Pr(>|t|)   
+    temp_over_100 -0.77630    0.36452  -2.130  0.03328 * 
+    temp_95_100   -0.84148    0.36351  -2.315  0.02069 * 
+    temp_90_95    -0.85016    0.36313  -2.341  0.01929 * 
+    temp_85_90    -0.86499    0.36279  -2.384  0.01718 * 
+    temp_80_85    -0.86365    0.36288  -2.380  0.01738 * 
+    temp_75_80    -0.85245    0.36285  -2.349  0.01887 * 
+    temp_70_75    -0.79005    0.36285  -2.177  0.02954 * 
+    temp_65_70    -0.84465    0.36295  -2.327  0.02003 * 
+    temp_60_65    -0.80136    0.36300  -2.208  0.02735 * 
+    temp_55_60    -0.85282    0.36332  -2.347  0.01898 * 
+    temp_50_55    -0.85031    0.36535  -2.327  0.02002 * 
+    temp_45_50    -0.86365    0.36827  -2.345  0.01909 * 
+    temp_40_45    -0.88765    0.37021  -2.398  0.01656 * 
+    temp_35_40    -0.80421    0.37567  -2.141  0.03238 * 
+    temp_30_35    -1.01605    0.39011  -2.605  0.00925 **
+    temp_25_30    -0.73156    0.40350  -1.813  0.06993 . 
+    temp_20_25         NaN         NA     NaN      NaN   
+    temp_15_20    -0.96762    0.40391  -2.396  0.01666 * 
+    temp_10_15         NaN         NA     NaN      NaN   
+    temp_5_10          NaN         NA     NaN      NaN   
+    temp_0_5           NaN         NA     NaN      NaN   
+    temp_under_0       NaN         NA     NaN      NaN   
+    holiday_bin    0.05034    0.03037   1.658  0.09749 . 
     ---
     Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -540,26 +473,6 @@ summary(model4)
     F-statistic(full model):3.876 on 39 and 2818 DF, p-value: 1.225e-14 
     F-statistic(proj model): 1.189 on 23 and 2818 DF, p-value: 0.2427 
     *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
-
-``` r
-library(modelsummary)
-
-modelplot(model2, coef_omit = 'holiday_bin') +
-  labs(title="Winter Results")
-```
-
-![](README_files/figure-commonmark/unnamed-chunk-10-1.png)
-
-``` r
-modelplot(model4, coef_omit = 'holiday_bin')+
-  labs(title="Summer Results")
-```
-
-![](README_files/figure-commonmark/unnamed-chunk-10-2.png)
-
-``` r
-#df4w$predicted_calls<-model2$fitted.values
-```
 
 There are 2 different maps. The summer map represents the regressions in
 the summer per police district in Baltimore city. The winter map
@@ -603,17 +516,15 @@ police_districts$trt_summer[police_districts$Dist_Name=="Southern"] <- 0.06162
 police_districts$trt_summer[police_districts$Dist_Name=="Southwestern"] <- -0.03609
 police_districts$trt_summer[police_districts$Dist_Name=="Western"] <- -0.09668
 
-#png("map_summer.png", width=6, height=4, unit="in", res=500)
+png("map_summer.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_summer", col=map.pal("greens"))
+dev.off()
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-13-1.png)
+    png 
+      2 
 
 ``` r
-#dev.off()
-
-
-
 # for winter
 police_districts$trt_winter <- 0
 
@@ -627,17 +538,41 @@ police_districts$trt_winter[police_districts$Dist_Name=="Southern"] <- 0.19048
 police_districts$trt_winter[police_districts$Dist_Name=="Southwestern"] <- 0.18269
 police_districts$trt_winter[police_districts$Dist_Name=="Western"] <- -0.32152
 
-#png("map_winter.png", width=6, height=4, unit="in", res=500)
+png("map_winter.png", width=6, height=4, unit="in", res=500)
 plot(police_districts, "trt_winter", col=map.pal("greens"))
+dev.off()
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-13-2.png)
+    png 
+      2 
 
-``` r
-#dev.off()
-```
+## Discussion:
 
-Future Plans:
+Our findings showed that during the winter months, there is an increase
+in mental health related calls as the temperature becomes either hotter
+or significantly colder. Similarly, during summer months, there is an
+increase in mental health related calls as the temperature rises. These
+results correlated with our initial scatter plots which showed more
+mental health related calls associated with extreme temperatures. After
+running regressions per each police district in Baltimore City, they
+showed that both in the summer and winter for every 1% of increase in
+temperature there are some police districts where there is some amount
+of increase in the number of calls received while in others there is a
+decrease. A related study, Burke et al. (2018) found a similar
+relationship between temperature and the amount of suicides that occur.
+They found that there is an increase by 0.7% in suicide rate per 1.8
+degrees Fahrenheit rise in temperature. Additionally, Janzen (2022)
+stated that cold weather forces people to have more alone time leading
+to feelings of sadness. The feeling of sadness causes poor mental health
+thus leading to more distress calls explaining why colder temperatures
+lead to a greater amount of calls.
+
+There are still the ways to improve our research. We plan to use data
+about the human comfort index instead of using ground temperature. We
+also plan to taken into the frequency of extreme temperature into
+account.
+
+## Future Plans:
 
 - Alter the graph so that it shows the relationship between specific
   temperature periods to the number of calls
@@ -655,3 +590,34 @@ Future Plans:
   - trees
 
   - air quality
+
+## **Bibliography:** 
+
+Burke, M., González, F., Baylis, P., Heft-Neal, S., Baysan, C., Basu,
+S., & Hsiang, S. (2018). Higher temperatures increase suicide rates in
+the United States and Mexico. Nature Climate Change, 8(8), 723–729.
+<https://doi.org/10.1038/s41558-018-0222-x> 
+
+Change, N. G. C. (n.d.). Global Surface Temperature \| NASA Global
+Climate Change. Climate Change: Vital Signs of the Planet. Retrieved
+October 22, 2024, from
+<https://climate.nasa.gov/vital-signs/global-temperature/?intent=121> 
+
+Diallo, I., He, L., Koehler, K., Spira, A. P., Kale, R., Ou, J., Smith,
+G., Linton, S. L., & Augustinavicius, J. (2024). Community perspectives
+on heat and health in Baltimore City. Urban Climate, 54, 101841.
+<https://doi.org/10.1016/j.uclim.2024.101841> 
+
+Evans, M., Gazze, L., & Schaller, J. (2023). Temperature and
+maltreatment of young children. <https://doi.org/10.3386/w31522>).
+
+Heilmann, K., Kahn, M. E., & Tang, C. K. (2021). The urban crime and
+heat gradient in high and low poverty areas. Journal of Public
+Economics, 197, 104408. <https://doi.org/10.1016/j.jpubeco.2021.104408>
+
+Janzen, B. (2022). Temperature and Mental Health: Evidence from Helpline
+Calls. ArXiv. <https://arxiv.org/abs/2207.04992>
+
+Srivastava, S., & Mullins, J. T. (2024). Temperature, Mental Health, and
+Individual Crises: Evidence from Crisis Text Line. American Journal of
+Health Economics. <https://doi.org/10.1086/730332> 
